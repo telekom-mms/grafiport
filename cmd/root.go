@@ -28,16 +28,14 @@ var (
 				log.Println(username)
 			}
 			credentials = username + ":" + password
-			fileinfo, err := os.Stat(directory)
+			info, err := os.Stat(directory)
 			if os.IsNotExist(err) {
-				log.Println(fileinfo)
 				log.Fatal("No directory provided. \n Please create target folder")
 
 			}
-			if !fileinfo.IsDir() {
+			if !info.IsDir() {
 				log.Fatal("Path is not a directory.")
 			}
-			log.Println(fileinfo)
 			exports.Datasources(credentials, url, directory)
 			exports.Dashboards(credentials, url, directory)
 			exports.Folders(credentials, url, directory)
@@ -49,8 +47,7 @@ var (
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		log.Fatal(fmt.Fprintln(os.Stderr, err))
 	}
 }
 

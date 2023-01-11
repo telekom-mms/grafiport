@@ -33,6 +33,7 @@ func Datasources(credentials string, url string, directory string) {
 		os.Mkdir(path, 0660)
 	}
 	for _, ds := range datasources {
+		ds = removeCredentials(ds)
 		if dsPacked, err = json.Marshal(ds); err != nil {
 			fmt.Fprintf(os.Stderr, "%s for %s\n", err, ds.Name)
 			continue
@@ -41,4 +42,28 @@ func Datasources(credentials string, url string, directory string) {
 			fmt.Fprintf(os.Stderr, "%s for %s\n", err, meta.Slug)
 		}
 	}
+}
+
+func removeCredentials(ds sdk.Datasource) sdk.Datasource {
+	if ds.User != nil {
+		if *ds.User != "" {
+			*ds.User = ""
+		}
+	}
+	if ds.Password != nil {
+		if *ds.Password != "" {
+			*ds.Password = ""
+		}
+	}
+	if ds.BasicAuthUser != nil {
+		if *ds.BasicAuthUser != "" {
+			*ds.BasicAuthUser = ""
+		}
+	}
+	if ds.BasicAuthPassword != nil {
+		if *ds.BasicAuthPassword != "" {
+			*ds.BasicAuthPassword = ""
+		}
+	}
+	return ds
 }
