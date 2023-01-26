@@ -16,8 +16,7 @@ RUN go build -o grafana-exporter
 
 # final stage
 FROM alpine:latest
-COPY --from=build-env /go/src/grafana-exporter/grafana-exporter /app/
+COPY --from=build-env /go/src/grafana-exporter/grafana-exporter  /usr/local/bin/grafana-exporter
 RUN mkdir -p /opt/data/grafana-exporter
 ENV DIRECTORY /opt/data/grafana-exporter
-WORKDIR /app
-ENTRYPOINT ["./grafana-exporter"]
+ENTRYPOINT [""]
