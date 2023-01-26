@@ -19,4 +19,5 @@ FROM alpine:latest
 COPY --from=build-env /go/src/grafana-exporter/grafana-exporter /app/
 RUN mkdir -p /opt/data/grafana-exporter
 ENV DIRECTORY /opt/data/grafana-exporter
-ENTRYPOINT /app/grafana-exporter
+WORKDIR /app
+ENTRYPOINT ["./grafana-exporter"]
