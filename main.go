@@ -1,13 +1,12 @@
 package main
 
-var (
-	username  string
-	password  string
-	url       string
-	directory string
-	help      bool
+import(
+	exports "grafana-exporter/export"
 )
 
 func main() {
-	//	cmd.Execute()
+	exports.Datasources(credentials, url, directory)
+	exports.Dashboards(credentials, url, directory)
+	exports.Folders(credentials, url, directory)
+	exports.NotificationChannels(credentials, url, directory)
 }

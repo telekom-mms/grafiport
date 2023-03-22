@@ -4,6 +4,16 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"log"
+)
+
+var (
+	username  string
+	password  string
+	url       string
+	directory string
+	help      bool
+	credentials string
 )
 
 func init() {
@@ -32,5 +42,15 @@ func init() {
 	if directory == "" {
 		directory = os.Getenv("directory")
 	}
+	info, err := os.Stat(directory)
+	if os.IsNotExist(err) {
+		log.Fatal("No directory provided. \n Please create target folder")
+	}
+
+	if !info.IsDir() {
+		log.Fatal("Path is not a directory.")
+	}
+	
+	credentials = username + ":" + password
 	fmt.Println(username, directory, url, password)
 }
