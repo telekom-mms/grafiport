@@ -19,7 +19,7 @@ var (
 func init() {
 	flag.StringVar(&username, "u", "", "Username for Grafana Instance")
 	flag.StringVar(&password, "p", "", "Password for Grafana Instance")
-	flag.StringVar(&url, "url", "", "Url for Grafana Instance")
+	flag.StringVar(&url, "url", "", "Baseurl for your Grafana Instance.")
 	flag.StringVar(&directory, "directory", "", "Directory where Output/Input is stored")
 	flag.BoolVar(&help, "h", false, "Die Hilfe")
 

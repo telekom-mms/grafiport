@@ -30,7 +30,7 @@ func NotificationChannels(credentials string, url string, directory string) {
 	path := filepath.Join(directory, "notification-channels")
 	_, err = os.Stat(path)
 	if os.IsNotExist(err) {
-		os.Mkdir(path, 0660)
+		os.Mkdir(path, 0760)
 	}
 	for _, ds := range folders {
 		if dsPacked, err = json.Marshal(ds); err != nil {
