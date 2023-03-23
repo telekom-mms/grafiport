@@ -28,7 +28,7 @@ func Dashboards(credentials string, url string, directory string) {
 	path := filepath.Join(directory, "dashboard")
 	_, err = os.Stat(path)
 	if os.IsNotExist(err) {
-		os.Mkdir(path, 0660)
+		os.Mkdir(path, 0760)
 	}
 	for _, link := range boardLinks {
 		if rawBoard, meta, err = c.GetRawDashboardByUID(ctx, link.UID); err != nil {

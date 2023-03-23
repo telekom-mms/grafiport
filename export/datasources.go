@@ -30,10 +30,10 @@ func Datasources(credentials string, url string, directory string) {
 	path := filepath.Join(directory, "datasources")
 	_, err = os.Stat(path)
 	if os.IsNotExist(err) {
-		os.Mkdir(path, 0660)
+		os.Mkdir(path, 0760)
 	}
 	for _, ds := range datasources {
-		ds = removeCredentials(ds)
+		//ds = removeCredentials(ds)
 		if dsPacked, err = json.Marshal(ds); err != nil {
 			fmt.Fprintf(os.Stderr, "%s for %s\n", err, ds.Name)
 			continue
