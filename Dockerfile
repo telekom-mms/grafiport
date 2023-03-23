@@ -9,8 +9,8 @@ WORKDIR /go/src/grafana-exporter
 RUN go mod download
 
 WORKDIR /go/src/grafana-exporter
-ADD cmd cmd
-COPY main.go /go/src/grafana-exporter/
+ADD export export
+COPY *.go /go/src/grafana-exporter/
 WORKDIR /go/src/grafana-exporter
 RUN go build -o grafana-exporter
 
