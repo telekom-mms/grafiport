@@ -1,9 +1,12 @@
 package main
 
-import (
-	"grafana-exporter/cmd"
+import(
+	exports "grafana-exporter/export"
 )
 
 func main() {
-	cmd.Execute()
+	exports.Datasources(credentials, url, directory)
+	exports.Dashboards(credentials, url, directory)
+	exports.Folders(credentials, url, directory)
+	exports.NotificationChannels(credentials, url, directory)
 }
