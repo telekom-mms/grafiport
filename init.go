@@ -52,5 +52,5 @@ func init() {
 	}
 	
 	credentials = username + ":" + password
-	fmt.Println(username, directory, url, password)
+	//fmt.Println(username, directory, url, password)
 }
