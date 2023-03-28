@@ -2,17 +2,16 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"os"
 	"log"
+	"os"
 )
 
 var (
-	username  string
-	password  string
-	url       string
-	directory string
-	help      bool
+	username    string
+	password    string
+	url         string
+	directory   string
+	help        bool
 	credentials string
 )
 
@@ -50,7 +49,7 @@ func init() {
 	if !info.IsDir() {
 		log.Fatal("Path is not a directory.")
 	}
-	
+
 	credentials = username + ":" + password
 	//fmt.Println(username, directory, url, password)
 }
