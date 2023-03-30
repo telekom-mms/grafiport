@@ -4,7 +4,8 @@
 // NOTE: old datasources with same names will be silently overrided!
 //
 // Usage:
-//   import-datasousces http://sdk.host:3000 api-key-string-here
+//
+//	import-datasousces http://sdk.host:3000 api-key-string-here
 //
 // You need get API key with Admin rights from your Grafana!
 package restore
@@ -28,27 +29,23 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/grafana-tools/sdk"
 )
 
-func Datasources() {
+func Datasources(credentials string, url string, directory string) {
 	var (
 		datasources []sdk.Datasource
-		filesInDir  []os.FileInfo
+		filesInDir  []os.DirEntry
 		rawDS       []byte
 		status      sdk.StatusMessage
 		err         error
 	)
-	if len(os.Args) != 3 {
-		fmt.Fprint(os.Stderr, "Usage:  import-datasources http://sdk-host:3000 api-key-string-here\n")
-		os.Exit(0)
-	}
 	ctx := context.Background()
-	c, err := sdk.NewClient(os.Args[1], os.Args[2], sdk.DefaultHTTPClient)
+	c, err := sdk.NewClient(url, credentials, sdk.DefaultHTTPClient)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to create a client: %s\n", err)
 		os.Exit(1)
@@ -57,13 +54,15 @@ func Datasources() {
 		fmt.Fprint(os.Stderr, err)
 		os.Exit(1)
 	}
-	filesInDir, err = ioutil.ReadDir(".")
+	path := filepath.Join(directory, "dashboard")
+
+	filesInDir, err = os.ReadDir(path)
 	if err != nil {
 		fmt.Fprint(os.Stderr, err)
 	}
 	for _, file := range filesInDir {
 		if strings.HasSuffix(file.Name(), ".json") {
-			if rawDS, err = ioutil.ReadFile(file.Name()); err != nil {
+			if rawDS, err = os.ReadFile(file.Name()); err != nil {
 				fmt.Fprint(os.Stderr, err)
 				continue
 			}

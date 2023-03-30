@@ -7,7 +7,7 @@ import (
 
 func main() {
 	if restore {
-		restores.Datasources()
+		restores.Datasources(credentials, url, directory)
 	} else {
 		exports.Datasources(credentials, url, directory)
 		exports.Dashboards(credentials, url, directory)
