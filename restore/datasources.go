@@ -54,7 +54,7 @@ func Datasources(credentials string, url string, directory string) {
 		fmt.Fprint(os.Stderr, err)
 		os.Exit(1)
 	}
-	path := filepath.Join(directory, "dashboard")
+	path := filepath.Join(directory, "datasources")
 
 	filesInDir, err = os.ReadDir(path)
 	if err != nil {
@@ -62,7 +62,7 @@ func Datasources(credentials string, url string, directory string) {
 	}
 	for _, file := range filesInDir {
 		if strings.HasSuffix(file.Name(), ".json") {
-			if rawDS, err = os.ReadFile(file.Name()); err != nil {
+			if rawDS, err = os.ReadFile(filepath.Join(path, file.Name())); err != nil {
 				fmt.Fprint(os.Stderr, err)
 				continue
 			}
