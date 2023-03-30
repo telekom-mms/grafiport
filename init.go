@@ -2,18 +2,18 @@ package main
 
 import (
 	"flag"
-	"os"
 	"log"
+	"os"
 )
 
 var (
-	username  string
-	password  string
-	url       string
-	directory string
-	help      bool
+	username    string
+	password    string
+	url         string
+	directory   string
+	help        bool
 	credentials string
-	restore bool
+	restore     bool
 )
 
 func init() {
@@ -23,7 +23,7 @@ func init() {
 	flag.StringVar(&directory, "directory", "", "Directory where Output/Input is stored")
 	flag.BoolVar(&help, "h", false, "Die Hilfe")
 	flag.BoolVar(&restore, "r", false, "Der Restore von erstellten Backups")
-	
+
 	flag.Parse()
 
 	if help {
@@ -51,6 +51,6 @@ func init() {
 	if !info.IsDir() {
 		log.Fatal("Path is not a directory.")
 	}
-	
+
 	credentials = username + ":" + password
 }
