@@ -13,6 +13,7 @@ var (
 	directory   string
 	help        bool
 	credentials string
+	restore     bool
 )
 
 func init() {
@@ -21,6 +22,7 @@ func init() {
 	flag.StringVar(&url, "url", "", "Baseurl for your Grafana Instance.")
 	flag.StringVar(&directory, "directory", "", "Directory where Output/Input is stored")
 	flag.BoolVar(&help, "h", false, "Die Hilfe")
+	flag.BoolVar(&restore, "r", false, "Der Restore von erstellten Backups")
 
 	flag.Parse()
 
@@ -51,5 +53,4 @@ func init() {
 	}
 
 	credentials = username + ":" + password
-	//fmt.Println(username, directory, url, password)
 }
