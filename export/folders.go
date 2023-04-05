@@ -1,44 +1,42 @@
 package export
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/gosimple/slug"
-	"github.com/grafana-tools/sdk"
+	gapi "github.com/grafana/grafana-api-golang-client"
+	url2 "net/url"
 	"os"
 	"path/filepath"
 )
 
-func Folders(credentials string, url string, directory string) {
+func Folders(username, password, url, directory string) {
 	var (
-		folders  []sdk.Folder
-		dsPacked []byte
-		meta     sdk.BoardProperties
-		err      error
+		err        error
+		rawFolders []gapi.Folder
 	)
-	ctx := context.Background()
-	c, err := sdk.NewClient(url, credentials, sdk.DefaultHTTPClient)
+	foldername := "folders"
+	userinfo := url2.UserPassword(username, password)
+	config := gapi.Config{BasicAuth: userinfo}
+	client, err := gapi.New(url, config)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to create a client: %s\n", err)
 		os.Exit(1)
 	}
-	if folders, err = c.GetAllFolders(ctx); err != nil {
-		fmt.Fprint(os.Stderr, err)
-		os.Exit(1)
-	}
-	path := filepath.Join(directory, "folders")
+	path := filepath.Join(directory, foldername)
 	_, err = os.Stat(path)
 	if os.IsNotExist(err) {
 		os.Mkdir(path, 0760)
 	}
-	for _, ds := range folders {
-		if dsPacked, err = json.Marshal(ds); err != nil {
-			fmt.Fprintf(os.Stderr, "%s for %s\n", err, ds.Title)
-			continue
-		}
-		if err = os.WriteFile(filepath.Join(path, fmt.Sprintf("%s.json", slug.Make(ds.Title))), dsPacked, os.FileMode(int(0666))); err != nil {
-			fmt.Fprintf(os.Stderr, "%s for %s\n", err, meta.Slug)
-		}
+	folders, err := client.Folders()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to create search dashboards: %s\n", err)
+		os.Exit(1)
+	}
+	for _, folder := range folders {
+		f, _ := client.FolderByUID(folder.UID)
+		rawFolders = append(rawFolders, *f)
+		jsonFolder, _ := json.Marshal(f)
+		_ = os.WriteFile(filepath.Join(path, slug.Make(folder.Title))+".json", jsonFolder, os.FileMode(int(0666)))
 	}
 }
