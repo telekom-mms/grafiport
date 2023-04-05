@@ -13,7 +13,6 @@ import (
 func Folders(username, password, url, directory string) {
 	var (
 		err        error
-		rawFolders []gapi.Folder
 	)
 	foldername := "folders"
 	userinfo := url2.UserPassword(username, password)
@@ -35,7 +34,6 @@ func Folders(username, password, url, directory string) {
 	}
 	for _, folder := range folders {
 		f, _ := client.FolderByUID(folder.UID)
-		rawFolders = append(rawFolders, *f)
 		jsonFolder, _ := json.Marshal(f)
 		_ = os.WriteFile(filepath.Join(path, slug.Make(folder.Title))+".json", jsonFolder, os.FileMode(int(0666)))
 	}

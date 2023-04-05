@@ -13,7 +13,6 @@ import (
 func Dashboards(username, password, url, directory string) {
 	var (
 		err           error
-		rawDashboards []gapi.Dashboard
 	)
 	foldername := "dashboards"
 	userinfo := url2.UserPassword(username, password)
@@ -35,7 +34,6 @@ func Dashboards(username, password, url, directory string) {
 	}
 	for _, dashboard := range dashboards {
 		ds, _ := client.DashboardByUID(dashboard.UID)
-		rawDashboards = append(rawDashboards, *ds)
 		jsonDashboard, _ := json.Marshal(ds)
 		_ = os.WriteFile(filepath.Join(path, slug.Make(dashboard.Title))+".json", jsonDashboard, os.FileMode(int(0666)))
 	}

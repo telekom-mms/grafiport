@@ -11,9 +11,6 @@ import (
 )
 
 func Datasources(username, password, url, directory string) {
-	var (
-		rawDatasources []gapi.DataSource
-	)
 	foldername := "datasources"
 	userinfo := url2.UserPassword(username, password)
 	config := gapi.Config{BasicAuth: userinfo}
@@ -34,7 +31,6 @@ func Datasources(username, password, url, directory string) {
 	}
 	for _, datasource := range datasources {
 		ds, _ := client.DataSourceByUID(datasource.UID)
-		rawDatasources = append(rawDatasources, *ds)
 		jsonDatasource, _ := json.Marshal(ds)
 		_ = os.WriteFile(filepath.Join(path, slug.Make(datasource.Name))+".json", jsonDatasource, os.FileMode(int(0666)))
 	}
