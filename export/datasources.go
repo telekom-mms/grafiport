@@ -29,9 +29,11 @@ func Datasources(username, password, url, directory string) {
 		fmt.Fprintf(os.Stderr, "Failed to create search datasources: %s\n", err)
 		os.Exit(1)
 	}
+
 	for _, datasource := range datasources {
 		ds, _ := client.DataSourceByUID(datasource.UID)
 		jsonDatasource, _ := json.Marshal(ds)
 		_ = os.WriteFile(filepath.Join(path, slug.Make(datasource.Name))+".json", jsonDatasource, os.FileMode(int(0666)))
 	}
+
 }
