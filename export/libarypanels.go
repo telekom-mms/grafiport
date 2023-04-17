@@ -36,7 +36,7 @@ func LibaryPanels(username, password, url, directory string) {
 
 	for _, panel := range libarypanels {
 		p, _ := client.LibraryPanelByUID(panel.UID)
-		rawLibaryPanels = append(rawLibaryPanels, *p)
+		rawLibaryPanels = append(rawLibaryPanels, *p) //TODO entfernen - die Lib wird nie verwendet
 		jsonLibaryPanels, _ := json.Marshal(p)
 		_ = os.WriteFile(filepath.Join(path, slug.Make(panel.Name))+".json", jsonLibaryPanels, os.FileMode(int(0666)))
 	}
