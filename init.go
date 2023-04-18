@@ -2,8 +2,9 @@ package main
 
 import (
 	"flag"
-	"log"
 	"os"
+
+	"github.com/charmbracelet/log"
 )
 
 var (
