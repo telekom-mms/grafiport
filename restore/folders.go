@@ -1,28 +1,32 @@
 package restore
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/grafana-tools/sdk"
+	gapi "github.com/grafana/grafana-api-golang-client"
+	url2 "net/url"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-func Folders(credentials string, url string, directory string) {
+func Folders(username, password, url, directory string) {
+
 	var (
 		filesInDir []os.DirEntry
-		folder     sdk.Folder
 		rawFolder  []byte
 	)
-	ctx := context.Background()
-	c, err := sdk.NewClient(url, credentials, sdk.DefaultHTTPClient)
+	foldername := "folders"
+	userinfo := url2.UserPassword(username, password)
+	config := gapi.Config{BasicAuth: userinfo}
+	client, err := gapi.New(url, config)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to create a client: %s\n", err)
 		os.Exit(1)
 	}
-	path := filepath.Join(directory, "folders")
+
+	path := filepath.Join(directory, foldername)
+
 	filesInDir, err = os.ReadDir(path)
 	if err != nil {
 		fmt.Fprint(os.Stderr, err)
@@ -33,14 +37,19 @@ func Folders(credentials string, url string, directory string) {
 				fmt.Fprint(os.Stderr, err)
 				continue
 			}
-		}
-		if err = json.Unmarshal(rawFolder, &folder); err != nil {
-			fmt.Fprint(os.Stderr, err)
-			continue
-		}
-		if folder, err = c.CreateFolder(ctx, folder); err != nil {
-			fmt.Fprintf(os.Stderr, "error on importing folder %s with %s", folder.Title, err)
-		}
 
+			var newFolder gapi.Folder
+			if err = json.Unmarshal(rawFolder, &newFolder); err != nil {
+				fmt.Fprint(os.Stderr, err)
+				continue
+			}
+			status, _ := client.FolderByUID(newFolder.UID)
+			if status.UID != "" {
+				client.UpdateFolder(newFolder.UID, newFolder.Title)
+
+			} else {
+				client.NewFolder(newFolder.Title, newFolder.UID)
+			}
+		}
 	}
 }

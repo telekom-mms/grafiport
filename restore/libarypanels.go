@@ -10,12 +10,12 @@ import (
 	"strings"
 )
 
-func Datasources(username, password, url, directory string) {
+func LibaryPanels(username, password, url, directory string) {
 	var (
-		filesInDir    []os.DirEntry
-		rawDatasource []byte
+		filesInDir []os.DirEntry
+		rawPanel   []byte
 	)
-	foldername := "datasources"
+	foldername := "libarypanels"
 	userinfo := url2.UserPassword(username, password)
 	config := gapi.Config{BasicAuth: userinfo}
 	client, err := gapi.New(url, config)
@@ -30,25 +30,27 @@ func Datasources(username, password, url, directory string) {
 	if err != nil {
 		fmt.Fprint(os.Stderr, err)
 	}
+
 	for _, file := range filesInDir {
 		if strings.HasSuffix(file.Name(), ".json") {
-			if rawDatasource, err = os.ReadFile(filepath.Join(path, file.Name())); err != nil {
+			if rawPanel, err = os.ReadFile(filepath.Join(path, file.Name())); err != nil {
 				fmt.Fprint(os.Stderr, err)
 				continue
 			}
 
-			var newDatasource gapi.DataSource
-			if err = json.Unmarshal(rawDatasource, &newDatasource); err != nil {
+			var newPanel gapi.LibraryPanel
+			if err = json.Unmarshal(rawPanel, &newPanel); err != nil {
 				fmt.Fprint(os.Stderr, err)
 				continue
 			}
-			status, _ := client.DataSourceByUID(newDatasource.UID)
+			status, _ := client.LibraryPanelByUID(newPanel.UID)
+			folder, _ := client.FolderByUID(newPanel.Meta.FolderUID)
+			newPanel.Folder = folder.ID
 			if status != nil {
-				client.UpdateDataSource(&newDatasource)
+				client.PatchLibraryPanel(newPanel.UID, newPanel)
 
 			} else {
-				client.NewDataSource(&newDatasource)
-
+				client.NewLibraryPanel(newPanel)
 			}
 		}
 	}

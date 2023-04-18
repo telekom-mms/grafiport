@@ -10,11 +10,11 @@ import (
 	"path/filepath"
 )
 
-func Folders(username, password, url, directory string) {
+func AlertRules(username, password, url, directory string) {
 	var (
-		err        error
+		err error
 	)
-	foldername := "folders"
+	foldername := "alertrules"
 	userinfo := url2.UserPassword(username, password)
 	config := gapi.Config{BasicAuth: userinfo}
 	client, err := gapi.New(url, config)
@@ -27,14 +27,15 @@ func Folders(username, password, url, directory string) {
 	if os.IsNotExist(err) {
 		os.Mkdir(path, 0760)
 	}
-	folders, err := client.Folders()
+	// wir benötigen erst alle Folder mit den ID's bevor wir uns die AlertRules holen können, da diese an den folder hängen
+	alertRules, err := client.AlertRules()
+
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to create search dashboards: %s\n", err)
 		os.Exit(1)
 	}
-	for _, folder := range folders {
-		f, _ := client.FolderByUID(folder.UID)
-		jsonFolder, _ := json.Marshal(f)
-		_ = os.WriteFile(filepath.Join(path, slug.Make(folder.Title))+".json", jsonFolder, os.FileMode(int(0666)))
+	for _, alertRule := range alertRules {
+		jsonFolder, _ := json.Marshal(alertRule)
+		_ = os.WriteFile(filepath.Join(path, slug.Make(alertRule.Title))+".json", jsonFolder, os.FileMode(int(0666)))
 	}
 }
