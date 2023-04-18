@@ -16,5 +16,6 @@ func main() {
 		exports.Dashboards(username, password, url, directory)
 		exports.Folders(username, password, url, directory)
 		exports.LibaryPanels(username, password, url, directory)
+		exports.AlertRules(username, password, url, directory)
 	}
 }
