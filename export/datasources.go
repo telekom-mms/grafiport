@@ -1,69 +1,39 @@
 package export
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/gosimple/slug"
-	"github.com/grafana-tools/sdk"
+	gapi "github.com/grafana/grafana-api-golang-client"
+	url2 "net/url"
 	"os"
 	"path/filepath"
 )
 
-func Datasources(credentials string, url string, directory string) {
-	var (
-		datasources []sdk.Datasource
-		dsPacked    []byte
-		meta        sdk.BoardProperties
-		err         error
-	)
-	ctx := context.Background()
-	c, err := sdk.NewClient(url, credentials, sdk.DefaultHTTPClient)
+func Datasources(username, password, url, directory string) {
+	foldername := "datasources"
+	userinfo := url2.UserPassword(username, password)
+	config := gapi.Config{BasicAuth: userinfo}
+	client, err := gapi.New(url, config)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to create a client: %s\n", err)
 		os.Exit(1)
 	}
-	if datasources, err = c.GetAllDatasources(ctx); err != nil {
-		fmt.Fprint(os.Stderr, err)
-		os.Exit(1)
-	}
-	path := filepath.Join(directory, "datasources")
+	path := filepath.Join(directory, foldername)
 	_, err = os.Stat(path)
 	if os.IsNotExist(err) {
 		os.Mkdir(path, 0760)
 	}
-	for _, ds := range datasources {
-		//ds = removeCredentials(ds)
-		if dsPacked, err = json.Marshal(ds); err != nil {
-			fmt.Fprintf(os.Stderr, "%s for %s\n", err, ds.Name)
-			continue
-		}
-		if err = os.WriteFile(filepath.Join(path, fmt.Sprintf("%s.json", slug.Make(ds.Name))), dsPacked, os.FileMode(int(0666))); err != nil {
-			fmt.Fprintf(os.Stderr, "%s for %s\n", err, meta.Slug)
-		}
+	datasources, err := client.DataSources()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to create search datasources: %s\n", err)
+		os.Exit(1)
 	}
-}
 
-func removeCredentials(ds sdk.Datasource) sdk.Datasource {
-	if ds.User != nil {
-		if *ds.User != "" {
-			*ds.User = ""
-		}
+	for _, datasource := range datasources {
+		ds, _ := client.DataSourceByUID(datasource.UID)
+		jsonDatasource, _ := json.Marshal(ds)
+		_ = os.WriteFile(filepath.Join(path, slug.Make(datasource.Name))+".json", jsonDatasource, os.FileMode(int(0666)))
 	}
-	if ds.Password != nil {
-		if *ds.Password != "" {
-			*ds.Password = ""
-		}
-	}
-	if ds.BasicAuthUser != nil {
-		if *ds.BasicAuthUser != "" {
-			*ds.BasicAuthUser = ""
-		}
-	}
-	if ds.BasicAuthPassword != nil {
-		if *ds.BasicAuthPassword != "" {
-			*ds.BasicAuthPassword = ""
-		}
-	}
-	return ds
+
 }

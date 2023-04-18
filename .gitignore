@@ -21,3 +21,8 @@
 go.work
 
 .idea/*
+# Testordner ausklammern
+test/*
+# vscode entfernt
+.vscode/*
+grafana-exporter
