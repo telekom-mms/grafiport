@@ -1,3 +1,7 @@
+stages:
+  - release
+  - build
+
 docker-build:
   image: docker:latest
   stage: build
@@ -24,10 +28,6 @@ docker-build:
       exists:
         - Dockerfile
 
-stages:
-  - release
-  - build
-
 release:
   stage: release
   image: docker:stable
@@ -51,4 +51,4 @@ release:
       -v /var/run/docker.sock:/var/run/docker.sock \
       -e DOCKER_USERNAME -e DOCKER_PASSWORD -e DOCKER_REGISTRY  \
       -e GITLAB_TOKEN \
-      goreleaser/goreleaser release --rm-dist
+      goreleaser/goreleaser release --clean
