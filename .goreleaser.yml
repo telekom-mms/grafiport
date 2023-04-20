@@ -20,3 +20,4 @@ gitlab_urls:
 dockers:
   - image_templates:
     - 7001-02/grafana-exporter
+  dockerfile: goreleaser.dockerfile
