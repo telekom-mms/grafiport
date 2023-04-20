@@ -18,6 +18,8 @@ gitlab_urls:
   use_job_token: false
 
 dockers:
+  -
+  id: gitlab
   image_templates:
     - 7001-02/grafana-exporter
   dockerfile: goreleaser.dockerfile
