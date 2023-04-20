@@ -16,3 +16,7 @@ gitlab_urls:
   # Default: false
   # Since: v1.11
   use_job_token: false
+
+dockers:
+  - image_templates:
+    - 7001-02/grafana-exporter
