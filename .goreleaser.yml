@@ -23,3 +23,11 @@ dockers:
     image_templates:
     - "7001-02/{{.ProjectName}}"
   dockerfile: goreleaser.dockerfile
+
+dockers:
+-
+  goos: linux
+  goarch: amd64
+  image_templates:
+  - 'git-images.mms-support.de/7001-02/grafana-exporter:{{ .Tag }}'
+  - 'git-images.mms-support.de/7001-02/grafana-exporter:latest'
