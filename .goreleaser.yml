@@ -17,9 +17,9 @@ gitlab_urls:
   # Since: v1.11
   use_job_token: false
 
+project_name: grafana-exporter
 dockers:
   -
-  id: gitlab
-  image_templates:
-    - 7001-02/grafana-exporter
+    image_templates:
+    - "7001-02/{{.ProjectName}}"
   dockerfile: goreleaser.dockerfile
