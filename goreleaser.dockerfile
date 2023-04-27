@@ -1,4 +1,6 @@
 # final stage
-FROM scratch
+FROM alpine:latest
 COPY grafana-exporter /
+RUN mkdir -p /output
+ENV DIRECTORY /output
 ENTRYPOINT ["/grafana-exporter"]

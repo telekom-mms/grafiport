@@ -42,7 +42,7 @@ func init() {
 		url = os.Getenv("url")
 	}
 	if directory == "" {
-		directory = os.Getenv("directory")
+		directory = os.Getenv("DIRECTORY")
 	}
 	info, err := os.Stat(directory)
 	if os.IsNotExist(err) {

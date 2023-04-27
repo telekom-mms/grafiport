@@ -17,7 +17,18 @@ gitlab_urls:
   # Since: v1.11
   use_job_token: false
 
+# project_name: grafana-exporter
+# dockers:
+#   -
+#     image_templates:
+#     - "7001-02/{{.ProjectName}}"
+#   dockerfile: goreleaser.dockerfile
+
 dockers:
-  image_templates:
-    - 7001-02/grafana-exporter
+-
+  goos: linux
+  goarch: amd64
   dockerfile: goreleaser.dockerfile
+  image_templates:
+  - 'git-images.mms-support.de/7001-02/grafana-exporter:{{ .Tag }}'
+  - 'git-images.mms-support.de/7001-02/grafana-exporter:latest'
