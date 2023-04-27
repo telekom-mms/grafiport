@@ -1,4 +1,4 @@
 # final stage
 FROM scratch
-COPY grafana-exporter grafana-exporter
-ENTRYPOINT [""]
+COPY grafana-exporter /
+ENTRYPOINT ["/grafana-exporter"]
