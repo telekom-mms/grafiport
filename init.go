@@ -15,6 +15,7 @@ var (
 	help        bool
 	credentials string
 	restore     bool
+	alerting    bool
 )
 
 func init() {
@@ -24,6 +25,7 @@ func init() {
 	flag.StringVar(&directory, "directory", "", "Directory where Output/Input is stored")
 	flag.BoolVar(&help, "h", false, "Die Hilfe")
 	flag.BoolVar(&restore, "r", false, "Der Restore von erstellten Backups")
+	flag.BoolVar(&alerting, "alerting", false, "Export Restore der Alerting Objekte wie Alert Rules, Contact points, Notification policies mit einschließen")
 
 	flag.Parse()
 
@@ -52,6 +54,4 @@ func init() {
 	if !info.IsDir() {
 		log.Fatal("Path is not a directory.")
 	}
-
-	credentials = username + ":" + password
 }
