@@ -2,7 +2,7 @@ package export
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/charmbracelet/log"
 	"github.com/gosimple/slug"
 	gapi "github.com/grafana/grafana-api-golang-client"
 	url2 "net/url"
@@ -10,32 +10,44 @@ import (
 	"path/filepath"
 )
 
-func Dashboards(username, password, url, directory string) {
+func Dashboards(username, password, url, directory string) error {
 	var (
-		err           error
+		err error
 	)
-	foldername := "dashboards"
-	userinfo := url2.UserPassword(username, password)
-	config := gapi.Config{BasicAuth: userinfo}
+	folderName := "dashboards"
+	userInfo := url2.UserPassword(username, password)
+	config := gapi.Config{BasicAuth: userInfo}
 	client, err := gapi.New(url, config)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create a client: %s\n", err)
-		os.Exit(1)
+		log.Error("Failed to create a client%s\n", err)
+		return err
 	}
-	path := filepath.Join(directory, foldername)
+	path := filepath.Join(directory, folderName)
 	_, err = os.Stat(path)
 	if os.IsNotExist(err) {
-		os.Mkdir(path, 0760)
+		err = os.Mkdir(path, 0760)
+		if err != nil {
+			log.Fatal("Error creating directory", err)
+		}
 	}
 	dashboards, err := client.Dashboards()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create search dashboards: %s\n", err)
-		os.Exit(1)
+		log.Error("Failed to get Dashboards", err)
+		return err
 	}
 	for _, dashboard := range dashboards {
-		ds, _ := client.DashboardByUID(dashboard.UID)
-		jsonDashboard, _ := json.Marshal(ds)
-		_ = os.WriteFile(filepath.Join(path, slug.Make(dashboard.Title))+".json", jsonDashboard, os.FileMode(int(0666)))
+		ds, err := client.DashboardByUID(dashboard.UID)
+		if err != nil {
+			log.Error("Error fetching Dashboard", err)
+		}
+		jsonDashboard, err := json.Marshal(ds)
+		if err != nil {
+			log.Error("Error unmarshalling json File", err)
+		}
+		err = os.WriteFile(filepath.Join(path, slug.Make(dashboard.Title))+".json", jsonDashboard, os.FileMode(0666))
+		if err != nil {
+			log.Error("Couldn't write Dashboard to disk", err)
+		}
 	}
-
+	return nil
 }

@@ -2,7 +2,7 @@ package restore
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/charmbracelet/log"
 	gapi "github.com/grafana/grafana-api-golang-client"
 	url2 "net/url"
 	"os"
@@ -10,50 +10,59 @@ import (
 	"strings"
 )
 
-func NotificationPolicies(username, password, url, directory string) {
+func NotificationPolicies(username, password, url, directory string) error {
 
 	var (
 		filesInDir              []os.DirEntry
 		rawNotificationPolicies []byte
 	)
-	foldername := "notificationpolicies"
+	folderName := "notificationPolicies"
 	userinfo := url2.UserPassword(username, password)
 	config := gapi.Config{BasicAuth: userinfo}
 	client, err := gapi.New(url, config)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create a client: %s\n", err)
-		os.Exit(1)
+		log.Error("Failed to create a client%s\n", err)
+		return err
 	}
 
-	path := filepath.Join(directory, foldername)
+	path := filepath.Join(directory, folderName)
 
 	filesInDir, err = os.ReadDir(path)
 	if err != nil {
-		fmt.Fprint(os.Stderr, err)
+		log.Error("Failed to read folder%s\n", err)
+		return err
 	}
 	for _, file := range filesInDir {
 		if strings.HasSuffix(file.Name(), ".json") {
 			if rawNotificationPolicies, err = os.ReadFile(filepath.Join(path, file.Name())); err != nil {
-				fmt.Fprint(os.Stderr, err)
+				log.Error(err)
 				continue
 			}
 
 			var newNotificationPolicies gapi.NotificationPolicyTree
 			if err = json.Unmarshal(rawNotificationPolicies, &newNotificationPolicies); err != nil {
-				fmt.Fprint(os.Stderr, err)
+				log.Error(err)
 				continue
 			}
-			_, err := client.NotificationPolicyTree()
-			if err == nil {
-				client.ResetNotificationPolicyTree()
-				fmt.Println("update NotificationPolicyTree")
-
-				err := client.SetNotificationPolicyTree(&newNotificationPolicies)
-				fmt.Println(err)
+			_, er := client.NotificationPolicyTree()
+			if er == nil {
+				err = client.ResetNotificationPolicyTree()
+				if err != nil {
+					log.Error("Error updating Notification Policy Tree - resetting (1/2)", err)
+					continue
+				}
+				err = client.SetNotificationPolicyTree(&newNotificationPolicies)
+				if err != nil {
+					log.Error("Error updating Policy Tree - creating (1/2)", err)
+				}
 			} else {
-				client.SetNotificationPolicyTree(&newNotificationPolicies)
+				err = client.SetNotificationPolicyTree(&newNotificationPolicies)
+				if err != nil {
+					log.Error("Error creating  Notification Policy Tree", err)
+				}
 			}
 
 		}
 	}
+	return nil
 }

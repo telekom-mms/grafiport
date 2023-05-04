@@ -2,7 +2,7 @@ package restore
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/charmbracelet/log"
 	gapi "github.com/grafana/grafana-api-golang-client"
 	url2 "net/url"
 	"os"
@@ -10,46 +10,54 @@ import (
 	"strings"
 )
 
-func Folders(username, password, url, directory string) {
+func Folders(username, password, url, directory string) error {
 
 	var (
 		filesInDir []os.DirEntry
 		rawFolder  []byte
+		err        error
 	)
-	foldername := "folders"
-	userinfo := url2.UserPassword(username, password)
-	config := gapi.Config{BasicAuth: userinfo}
+	folderName := "folders"
+	userInfo := url2.UserPassword(username, password)
+	config := gapi.Config{BasicAuth: userInfo}
 	client, err := gapi.New(url, config)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create a client: %s\n", err)
-		os.Exit(1)
+		log.Error("Failed to create a client%s\n", err)
+		return err
 	}
 
-	path := filepath.Join(directory, foldername)
+	path := filepath.Join(directory, folderName)
 
 	filesInDir, err = os.ReadDir(path)
 	if err != nil {
-		fmt.Fprint(os.Stderr, err)
+		log.Error("Failed to read folder%s\n", err)
+		return err
 	}
 	for _, file := range filesInDir {
 		if strings.HasSuffix(file.Name(), ".json") {
 			if rawFolder, err = os.ReadFile(filepath.Join(path, file.Name())); err != nil {
-				fmt.Fprint(os.Stderr, err)
+				log.Error(err)
 				continue
 			}
 
 			var newFolder gapi.Folder
 			if err = json.Unmarshal(rawFolder, &newFolder); err != nil {
-				fmt.Fprint(os.Stderr, err)
+				log.Error(err)
 				continue
 			}
 			status, _ := client.FolderByUID(newFolder.UID)
 			if status.UID != "" {
-				client.UpdateFolder(newFolder.UID, newFolder.Title)
-
+				err = client.UpdateFolder(newFolder.UID, newFolder.Title)
+				if err != nil {
+					log.Error("Error updating Folder", err)
+				}
 			} else {
-				client.NewFolder(newFolder.Title, newFolder.UID)
+				_, err = client.NewFolder(newFolder.Title, newFolder.UID)
+				if err != nil {
+					log.Error("Error creating Folder", err)
+				}
 			}
 		}
 	}
+	return err
 }

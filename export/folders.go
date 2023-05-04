@@ -2,7 +2,7 @@ package export
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/charmbracelet/log"
 	"github.com/gosimple/slug"
 	gapi "github.com/grafana/grafana-api-golang-client"
 	url2 "net/url"
@@ -10,31 +10,44 @@ import (
 	"path/filepath"
 )
 
-func Folders(username, password, url, directory string) {
+func Folders(username, password, url, directory string) error {
 	var (
-		err        error
+		err error
 	)
-	foldername := "folders"
-	userinfo := url2.UserPassword(username, password)
-	config := gapi.Config{BasicAuth: userinfo}
+	folderName := "folders"
+	userInfo := url2.UserPassword(username, password)
+	config := gapi.Config{BasicAuth: userInfo}
 	client, err := gapi.New(url, config)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create a client: %s\n", err)
-		os.Exit(1)
+		log.Error("Failed to create a client%s\n", err)
+		return err
 	}
-	path := filepath.Join(directory, foldername)
+	path := filepath.Join(directory, folderName)
 	_, err = os.Stat(path)
 	if os.IsNotExist(err) {
-		os.Mkdir(path, 0760)
+		err = os.Mkdir(path, 0760)
+		if err != nil {
+			log.Fatal("Error creating directory", err)
+		}
 	}
 	folders, err := client.Folders()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create search dashboards: %s\n", err)
-		os.Exit(1)
+		log.Error("Failed to get Folders", err)
+		return err
 	}
 	for _, folder := range folders {
-		f, _ := client.FolderByUID(folder.UID)
-		jsonFolder, _ := json.Marshal(f)
-		_ = os.WriteFile(filepath.Join(path, slug.Make(folder.Title))+".json", jsonFolder, os.FileMode(int(0666)))
+		f, err := client.FolderByUID(folder.UID)
+		if err != nil {
+			log.Error("Error fetching Folder", err)
+		}
+		jsonFolder, err := json.Marshal(f)
+		if err != nil {
+			log.Error("Error unmarshalling json File", err)
+		}
+		err = os.WriteFile(filepath.Join(path, slug.Make(folder.Title))+".json", jsonFolder, os.FileMode(0666))
+		if err != nil {
+			log.Error("Couldn't write Folder to disk", err)
+		}
 	}
+	return nil
 }
