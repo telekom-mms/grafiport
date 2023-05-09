@@ -3,7 +3,7 @@ stages:
   - build
 
 docker-build:
-  image: docker:git
+  image: docker:latest
   stage: build
   services:
     - docker:dind
