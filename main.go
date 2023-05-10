@@ -15,9 +15,11 @@ func main() {
 		err = restores.LibraryPanels(username, password, url, directory)
 		err = restores.Dashboards(username, password, url, directory)
 		if alerting {
+			err = restores.AlertRules(username, password, url, directory)
 			err = restores.ContactPoints(username, password, url, directory)
 			err = restores.NotificationPolicies(username, password, url, directory)
 		}
+
 		if err != nil {
 			log.Error("Error in Export execution")
 		}
