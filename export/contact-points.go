@@ -2,7 +2,7 @@ package export
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/charmbracelet/log"
 	"github.com/gosimple/slug"
 	gapi "github.com/grafana/grafana-api-golang-client"
 	url2 "net/url"
@@ -10,33 +10,43 @@ import (
 	"path/filepath"
 )
 
-func ContactPoints(username, password, url, directory string) {
+func ContactPoints(username, password, url, directory string) error {
 	var (
 		err error
 	)
-	foldername := "contactpoints"
-	userinfo := url2.UserPassword(username, password)
-	config := gapi.Config{BasicAuth: userinfo}
+	folderName := "contactPoints"
+	userInfo := url2.UserPassword(username, password)
+	config := gapi.Config{BasicAuth: userInfo}
 	client, err := gapi.New(url, config)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create a client: %s\n", err)
-		os.Exit(1)
+		log.Error("Failed to create a client%s\n", err)
+		return err
 	}
-	path := filepath.Join(directory, foldername)
+	path := filepath.Join(directory, folderName)
 	_, err = os.Stat(path)
 	if os.IsNotExist(err) {
-		os.Mkdir(path, 0760)
+		err = os.Mkdir(path, 0760)
+		if err != nil {
+			log.Fatal("Error creating directory", err)
+		}
 	}
-	contactpoints, err := client.ContactPoints()
+	contactPoints, err := client.ContactPoints()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create search dashboards: %s\n", err)
-		os.Exit(1)
+		log.Error("Failed to get ContactPoints", err)
+		return err
 	}
-	for _, contactpoint := range contactpoints {
-		if contactpoint.UID == "" {
+	for _, contactPoint := range contactPoints {
+		if contactPoint.UID == "" {
 			continue
 		}
-		jsonDashboard, _ := json.Marshal(contactpoint)
-		_ = os.WriteFile(filepath.Join(path, slug.Make(contactpoint.Name))+".json", jsonDashboard, os.FileMode(int(0666)))
+		jsonContactPoint, err := json.Marshal(contactPoint)
+		if err != nil {
+			log.Error("Error unmarshalling json File", err)
+		}
+		err = os.WriteFile(filepath.Join(path, slug.Make(contactPoint.Name))+".json", jsonContactPoint, os.FileMode(0666))
+		if err != nil {
+			log.Error("Couldn't write AlertRule to disk", err)
+		}
 	}
+	return nil
 }

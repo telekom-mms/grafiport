@@ -1,29 +1,38 @@
 package main
 
 import (
+	"github.com/charmbracelet/log"
 	exports "grafana-exporter/export"
 	restores "grafana-exporter/restore"
 )
 
+var err error
+
 func main() {
 	if restore {
-		restores.Datasources(username, password, url, directory)
-		restores.Folders(username, password, url, directory)
-		restores.LibaryPanels(username, password, url, directory)
-		restores.Dashboards(username, password, url, directory)
+		err = restores.DataSources(username, password, url, directory)
+		err = restores.Folders(username, password, url, directory)
+		err = restores.LibraryPanels(username, password, url, directory)
+		err = restores.Dashboards(username, password, url, directory)
 		if alerting {
-			restores.ContactPoints(username, password, url, directory)
-			restores.NotificationPolicies(username, password, url, directory)
+			err = restores.ContactPoints(username, password, url, directory)
+			err = restores.NotificationPolicies(username, password, url, directory)
+		}
+		if err != nil {
+			log.Error("Error in Export execution")
 		}
 	} else {
-		exports.Datasources(username, password, url, directory)
-		exports.Dashboards(username, password, url, directory)
-		exports.Folders(username, password, url, directory)
-		exports.LibaryPanels(username, password, url, directory)
+		err = exports.DataSources(username, password, url, directory)
+		err = exports.Dashboards(username, password, url, directory)
+		err = exports.Folders(username, password, url, directory)
+		err = exports.LibraryPanels(username, password, url, directory)
 		if alerting {
-			exports.AlertRules(username, password, url, directory)
-			exports.ContactPoints(username, password, url, directory)
-			exports.NotificationPolicies(username, password, url, directory)
+			err = exports.AlertRules(username, password, url, directory)
+			err = exports.ContactPoints(username, password, url, directory)
+			err = exports.NotificationPolicies(username, password, url, directory)
+		}
+		if err != nil {
+			log.Error("Error in Restore execution")
 		}
 	}
 }

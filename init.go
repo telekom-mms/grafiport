@@ -8,14 +8,13 @@ import (
 )
 
 var (
-	username    string
-	password    string
-	url         string
-	directory   string
-	help        bool
-	credentials string
-	restore     bool
-	alerting    bool
+	username  string
+	password  string
+	url       string
+	directory string
+	help      bool
+	restore   bool
+	alerting  bool
 )
 
 func init() {

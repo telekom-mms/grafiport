@@ -2,7 +2,7 @@ package restore
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/charmbracelet/log"
 	gapi "github.com/grafana/grafana-api-golang-client"
 	url2 "net/url"
 	"os"
@@ -10,50 +10,51 @@ import (
 	"strings"
 )
 
-func ContactPoints(username, password, url, directory string) {
+func ContactPoints(username, password, url, directory string) error {
 	var (
 		filesInDir      []os.DirEntry
 		rawContactPoint []byte
+		err             error
 	)
-	fmt.Println("restoring contact points")
-	foldername := "contactpoints"
-	userinfo := url2.UserPassword(username, password)
-	config := gapi.Config{BasicAuth: userinfo}
+	folderName := "contactPoints"
+	userInfo := url2.UserPassword(username, password)
+	config := gapi.Config{BasicAuth: userInfo}
 	client, err := gapi.New(url, config)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create a client: %s\n", err)
-		os.Exit(1)
+		log.Error("Failed to create a client%s\n", err)
+		return err
 	}
 
-	path := filepath.Join(directory, foldername)
+	path := filepath.Join(directory, folderName)
 
 	filesInDir, err = os.ReadDir(path)
 	if err != nil {
-		fmt.Fprint(os.Stderr, err)
+		log.Error("Failed to read folder%s\n", err)
 	}
 	for _, file := range filesInDir {
 		if strings.HasSuffix(file.Name(), ".json") {
 			if rawContactPoint, err = os.ReadFile(filepath.Join(path, file.Name())); err != nil {
-				fmt.Fprint(os.Stderr, err)
+				log.Error(err)
 				continue
 			}
 
 			var newContactPoint gapi.ContactPoint
 			if err = json.Unmarshal(rawContactPoint, &newContactPoint); err != nil {
-				fmt.Fprint(os.Stderr, err)
+				log.Error(err)
 				continue
 			}
-			// TODO create special case for default email grafana point
-			_, err := client.ContactPoint(newContactPoint.UID)
-			fmt.Println(err)
-			// TODO explore error handling with http returncodes to correctly handle this case
-			if err == nil {
-				client.UpdateContactPoint(&newContactPoint)
-				println("update contact point")
-			} else {
-				client.NewContactPoint(&newContactPoint)
-			}
 
+			_, err = client.ContactPoint(newContactPoint.UID)
+			if err == nil {
+				err = client.UpdateContactPoint(&newContactPoint)
+				log.Error("Error updating ContactPoint ", err)
+				println("update contact point")
+
+			} else {
+				_, err = client.NewContactPoint(&newContactPoint)
+				log.Error("Error creating ContactPoint ", err)
+			}
 		}
 	}
+	return err
 }

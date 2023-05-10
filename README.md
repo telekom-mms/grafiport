@@ -4,7 +4,7 @@ Tool to export Grafana objects and store them in the filesystem.
 
 ## Restore of Alerting Config Objects not recommended
 
-Few Objects in Grafana are not supposed to be configured via api. They result would be a object
+Few Objects in Grafana are not supposed to be configured via api. They result would be an object
 which you can't configure anymore [explanation][provisioned_ressources].
 More to come...
 

@@ -10,12 +10,12 @@ import (
 	"strings"
 )
 
-func DataSources(username, password, url, directory string) error {
+func LibraryPanels(username, password, url, directory string) error {
 	var (
-		filesInDir    []os.DirEntry
-		rawDatasource []byte
+		filesInDir []os.DirEntry
+		rawPanel   []byte
 	)
-	folderName := "dataSources"
+	folderName := "libraryPanels"
 	userInfo := url2.UserPassword(username, password)
 	config := gapi.Config{BasicAuth: userInfo}
 	client, err := gapi.New(url, config)
@@ -31,33 +31,38 @@ func DataSources(username, password, url, directory string) error {
 		log.Error("Failed to read folder%s\n", err)
 		return err
 	}
+
 	for _, file := range filesInDir {
 		if strings.HasSuffix(file.Name(), ".json") {
-			if rawDatasource, err = os.ReadFile(filepath.Join(path, file.Name())); err != nil {
+			if rawPanel, err = os.ReadFile(filepath.Join(path, file.Name())); err != nil {
 				log.Error(err)
 				continue
 			}
 
-			var newDatasource gapi.DataSource
-			if err = json.Unmarshal(rawDatasource, &newDatasource); err != nil {
+			var newPanel gapi.LibraryPanel
+			if err = json.Unmarshal(rawPanel, &newPanel); err != nil {
 				log.Error(err)
 				continue
 			}
-			status, err := client.DataSourceByUID(newDatasource.UID)
+			status, err := client.LibraryPanelByUID(newPanel.UID)
 			if err != nil {
-				log.Error("Failed Status Check if Datasource already exists")
-				continue
+				log.Error("Error getting UID for Library Panel", err)
 			}
+			folder, err := client.FolderByUID(newPanel.Meta.FolderUID)
+			if err != nil {
+				log.Error("Error getting UID for Folder in Library Panel", err)
+			}
+			newPanel.Folder = folder.ID
 			if status != nil {
-				err = client.UpdateDataSource(&newDatasource)
+				_, err = client.PatchLibraryPanel(newPanel.UID, newPanel)
 				if err != nil {
-					log.Error("Error updating Datasource", err)
+					log.Error("Error updating Library Panel", err)
 				}
 
 			} else {
-				_, err = client.NewDataSource(&newDatasource)
+				_, err = client.NewLibraryPanel(newPanel)
 				if err != nil {
-					log.Error("Error creating Datasource", err)
+					log.Error("Error creating Library Panel", err)
 				}
 			}
 		}

@@ -10,10 +10,13 @@ import (
 	"path/filepath"
 )
 
-func DataSources(username, password, url, directory string) error {
-	folderName := "dataSources"
-	userInfo := url2.UserPassword(username, password)
-	config := gapi.Config{BasicAuth: userInfo}
+func LibraryPanels(username, password, url, directory string) error {
+	var (
+		err error
+	)
+	folderName := "libraryPanels"
+	userinfo := url2.UserPassword(username, password)
+	config := gapi.Config{BasicAuth: userinfo}
 	client, err := gapi.New(url, config)
 	if err != nil {
 		log.Error("Failed to create a client%s\n", err)
@@ -27,24 +30,24 @@ func DataSources(username, password, url, directory string) error {
 			log.Fatal("Error creating directory", err)
 		}
 	}
-	dataSources, err := client.DataSources()
+	libraryPanels, err := client.LibraryPanels()
 	if err != nil {
-		log.Error("Failed to create search dataSources", err)
+		log.Error("Failed to get LibraryPanels", err)
 		return err
 	}
 
-	for _, datasource := range dataSources {
-		ds, _ := client.DataSourceByUID(datasource.UID)
+	for _, panel := range libraryPanels {
+		p, _ := client.LibraryPanelByUID(panel.UID)
 		if err != nil {
-			log.Error("Error fetching DataSource from Grafana", err)
+			log.Error("Error fetching LibraryPanel", err)
 		}
-		jsonDatasource, err := json.Marshal(ds)
+		jsonLibraryPanels, err := json.Marshal(p)
 		if err != nil {
 			log.Error("Error unmarshalling json File", err)
 		}
-		err = os.WriteFile(filepath.Join(path, slug.Make(datasource.Name))+".json", jsonDatasource, os.FileMode(0666))
+		err = os.WriteFile(filepath.Join(path, slug.Make(panel.Name))+".json", jsonLibraryPanels, os.FileMode(0666))
 		if err != nil {
-			log.Error("Couldn't write DataSource to disk", err)
+			log.Error("Couldn't write Dashboard to disk", err)
 		}
 	}
 	return nil
