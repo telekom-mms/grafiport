@@ -46,7 +46,7 @@ func NotificationPolicies(username, password, url, directory string) error {
 	if err != nil {
 		log.Error("Couldn't write NotificationPolicies to disk", err)
 	} else {
-		log.Info("Exported NotificationPolicies", notificationPolicies.Receiver)
+		log.Info("Exported NotificationPolicies" + notificationPolicies.Receiver)
 	}
 	return nil
 }

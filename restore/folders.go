@@ -52,14 +52,14 @@ func Folders(username, password, url, directory string) error {
 				if err != nil {
 					log.Error("Error updating Folder", err)
 				} else {
-					log.Info("Updated Folder", newFolder.Title)
+					log.Info("Updated Folder" + newFolder.Title)
 				}
 			} else {
 				_, err = client.NewFolder(newFolder.Title, newFolder.UID)
 				if err != nil {
 					log.Error("Error creating Folder", err)
 				} else {
-					log.Info("Created Folder", newFolder.Title)
+					log.Info("Created Folder" + newFolder.Title)
 				}
 			}
 		}

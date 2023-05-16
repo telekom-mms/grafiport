@@ -48,7 +48,7 @@ func ContactPoints(username, password, url, directory string) error {
 		if err != nil {
 			log.Error("Couldn't write ContactPoint to disk", err)
 		} else {
-			log.Info("Exported ContactPoint", contactPoint.Name)
+			log.Info("Exported ContactPoint" + contactPoint.Name)
 		}
 	}
 	return nil

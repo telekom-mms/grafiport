@@ -55,14 +55,14 @@ func NotificationPolicies(username, password, url, directory string) error {
 				if err != nil {
 					log.Error("Error updating Policy Tree - creating (1/2)", err)
 				} else {
-					log.Info("Updated Policy Tree", newNotificationPolicies.Receiver)
+					log.Info("Updated Policy Tree" + newNotificationPolicies.Receiver)
 				}
 			} else {
 				err = client.SetNotificationPolicyTree(&newNotificationPolicies)
 				if err != nil {
 					log.Error("Error creating  Notification Policy Tree", err)
 				} else {
-					log.Info("Created  Policy Tree", newNotificationPolicies.Receiver)
+					log.Info("Created  Policy Tree" + newNotificationPolicies.Receiver)
 				}
 			}
 

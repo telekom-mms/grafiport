@@ -49,7 +49,7 @@ func Folders(username, password, url, directory string) error {
 		if err != nil {
 			log.Error("Couldn't write Folder to disk", err)
 		} else {
-			log.Info("Exported Folder", folder.Title)
+			log.Info("Exported Folder" + folder.Title)
 		}
 	}
 	return nil

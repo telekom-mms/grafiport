@@ -51,7 +51,7 @@ func ContactPoints(username, password, url, directory string) error {
 				if err != nil {
 					log.Error("Error updating ContactPoint ", err)
 				} else {
-					log.Info("Updated ContactPoint", newContactPoint.Name)
+					log.Info("Updated ContactPoint" + newContactPoint.Name)
 				}
 
 			} else {
@@ -59,7 +59,7 @@ func ContactPoints(username, password, url, directory string) error {
 				if err != nil {
 					log.Error("Error creating ContactPoint ", err)
 				} else {
-					log.Info("Created ContactPoint", newContactPoint.Name)
+					log.Info("Created ContactPoint" + newContactPoint.Name)
 				}
 			}
 		}

@@ -45,7 +45,7 @@ func AlertRules(username, password, url, directory string) error {
 		if err != nil {
 			log.Error("Couldn't write AlertRule to disk", err)
 		} else {
-			log.Info("Exported AlertRule", alertRule.Title)
+			log.Info("Exported AlertRule" + alertRule.Title)
 		}
 	}
 	return nil

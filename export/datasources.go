@@ -47,7 +47,7 @@ func DataSources(username, password, url, directory string) error {
 		if err != nil {
 			log.Error("Couldn't write DataSource to disk", err)
 		} else {
-			log.Info("Exported DataSource", datasource.Name)
+			log.Info("Exported DataSource" + datasource.Name)
 		}
 	}
 	return nil

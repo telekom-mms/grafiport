@@ -63,7 +63,7 @@ func LibraryPanels(username, password, url, directory string) error {
 				if err != nil {
 					log.Error("Error updating Library Panel", err)
 				} else {
-					log.Info("Updated  Library Panel", newPanel.Name)
+					log.Info("Updated  Library Panel" + newPanel.Name)
 				}
 
 			} else {
@@ -72,7 +72,7 @@ func LibraryPanels(username, password, url, directory string) error {
 				if err != nil {
 					log.Error("Error creating Library Panel", err)
 				} else {
-					log.Info("Created  Library Panel", newPanel.Name)
+					log.Info("Created  Library Panel" + newPanel.Name)
 				}
 
 			}

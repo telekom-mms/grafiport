@@ -49,7 +49,7 @@ func Dashboards(username, password, url, directory string) error {
 		if err != nil {
 			log.Error("Couldn't write Dashboard to disk", err)
 		} else {
-			log.Info("Exported Dashboard", dashboard.Title)
+			log.Info("Exported Dashboard" + dashboard.Title)
 		}
 	}
 	return nil

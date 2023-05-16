@@ -55,7 +55,7 @@ func DataSources(username, password, url, directory string) error {
 				if err != nil {
 					log.Error("Error updating Datasource", err, "Datasource: ", newDatasource)
 				} else {
-					log.Info("Updated Datasource", newDatasource.Name)
+					log.Info("Updated Datasource" + newDatasource.Name)
 				}
 
 			} else {
@@ -63,7 +63,7 @@ func DataSources(username, password, url, directory string) error {
 				if err != nil {
 					log.Error("Error creating Datasource", err)
 				} else {
-					log.Info("Created Datasource", newDatasource.Name)
+					log.Info("Created Datasource" + newDatasource.Name)
 				}
 
 			}

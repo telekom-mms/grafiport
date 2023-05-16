@@ -61,14 +61,14 @@ func Dashboards(username, password, url, directory string) error {
 					log.Error("Error updating Dashboard - create (2/2)", err)
 					continue
 				}
-				log.Info("Updated Dashboard", newDB.Model["title"])
+				log.Info("Updated Dashboard" + fmt.Sprint(newDB.Model["title"]))
 
 			} else {
 				_, err = client.NewDashboard(newDB)
 				if err != nil {
 					log.Error("Error creating Dashboard", err)
 				} else {
-					log.Info("Created Dashboard", newDB.Model["title"])
+					log.Info("Created Dashboard" + fmt.Sprint(newDB.Model["title"]))
 				}
 
 			}

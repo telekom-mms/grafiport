@@ -50,7 +50,7 @@ func LibraryPanels(username, password, url, directory string) error {
 		if err != nil {
 			log.Error("Couldn't write Dashboard to disk", err)
 		} else {
-			log.Info("Exported Libary Panels", panel.Name)
+			log.Info("Exported Libary Panels" + panel.Name)
 		}
 	}
 	return nil
