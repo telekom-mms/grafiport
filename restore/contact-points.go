@@ -25,6 +25,7 @@ func ContactPoints(username, password, url, directory string) error {
 		return err
 	}
 
+	log.Info("Starting to restore ContactPoints")
 	path := filepath.Join(directory, folderName)
 
 	filesInDir, err = os.ReadDir(path)
@@ -47,12 +48,19 @@ func ContactPoints(username, password, url, directory string) error {
 			_, err = client.ContactPoint(newContactPoint.UID)
 			if err == nil {
 				err = client.UpdateContactPoint(&newContactPoint)
-				log.Error("Error updating ContactPoint ", err)
-				println("update contact point")
+				if err != nil {
+					log.Error("Error updating ContactPoint ", err)
+				} else {
+					log.Info("Updated ContactPoint", newContactPoint.Name)
+				}
 
 			} else {
 				_, err = client.NewContactPoint(&newContactPoint)
-				log.Error("Error creating ContactPoint ", err)
+				if err != nil {
+					log.Error("Error creating ContactPoint ", err)
+				} else {
+					log.Info("Created ContactPoint", newContactPoint.Name)
+				}
 			}
 		}
 	}

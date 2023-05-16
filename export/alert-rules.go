@@ -22,6 +22,7 @@ func AlertRules(username, password, url, directory string) error {
 		log.Error("Failed to create a client%s\n", err)
 		return err
 	}
+	log.Info("Starting to export AlertRules")
 	path := filepath.Join(directory, folderName)
 	_, err = os.Stat(path)
 	if os.IsNotExist(err) {
@@ -43,6 +44,8 @@ func AlertRules(username, password, url, directory string) error {
 		err = os.WriteFile(filepath.Join(path, slug.Make(alertRule.Title))+".json", jsonAlertRule, os.FileMode(0666))
 		if err != nil {
 			log.Error("Couldn't write AlertRule to disk", err)
+		} else {
+			log.Info("Exported AlertRule", alertRule.Title)
 		}
 	}
 	return nil

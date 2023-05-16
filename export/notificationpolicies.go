@@ -22,6 +22,7 @@ func NotificationPolicies(username, password, url, directory string) error {
 		log.Error("Failed to create a client%s\n", err)
 		return err
 	}
+	log.Info("Starting to export NotificationPolicies")
 	path := filepath.Join(directory, folderName)
 	_, err = os.Stat(path)
 	if os.IsNotExist(err) {
@@ -44,6 +45,8 @@ func NotificationPolicies(username, password, url, directory string) error {
 	err = os.WriteFile(filepath.Join(path, slug.Make(notificationPolicies.Receiver))+".json", jsonFolder, os.FileMode(0666))
 	if err != nil {
 		log.Error("Couldn't write NotificationPolicies to disk", err)
+	} else {
+		log.Info("Exported NotificationPolicies", notificationPolicies.Receiver)
 	}
 	return nil
 }

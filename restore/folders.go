@@ -26,6 +26,7 @@ func Folders(username, password, url, directory string) error {
 		return err
 	}
 
+	log.Info("Starting to restore Folders")
 	path := filepath.Join(directory, folderName)
 
 	filesInDir, err = os.ReadDir(path)
@@ -50,11 +51,15 @@ func Folders(username, password, url, directory string) error {
 				err = client.UpdateFolder(newFolder.UID, newFolder.Title)
 				if err != nil {
 					log.Error("Error updating Folder", err)
+				} else {
+					log.Info("Updated Folder", newFolder.Title)
 				}
 			} else {
 				_, err = client.NewFolder(newFolder.Title, newFolder.UID)
 				if err != nil {
 					log.Error("Error creating Folder", err)
+				} else {
+					log.Info("Created Folder", newFolder.Title)
 				}
 			}
 		}

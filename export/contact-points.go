@@ -22,6 +22,7 @@ func ContactPoints(username, password, url, directory string) error {
 		log.Error("Failed to create a client%s\n", err)
 		return err
 	}
+	log.Info("Starting to export ContactPoints")
 	path := filepath.Join(directory, folderName)
 	_, err = os.Stat(path)
 	if os.IsNotExist(err) {
@@ -45,7 +46,9 @@ func ContactPoints(username, password, url, directory string) error {
 		}
 		err = os.WriteFile(filepath.Join(path, slug.Make(contactPoint.Name))+".json", jsonContactPoint, os.FileMode(0666))
 		if err != nil {
-			log.Error("Couldn't write AlertRule to disk", err)
+			log.Error("Couldn't write ContactPoint to disk", err)
+		} else {
+			log.Info("Exported ContactPoint", contactPoint.Name)
 		}
 	}
 	return nil
