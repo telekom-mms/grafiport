@@ -22,6 +22,7 @@ func LibraryPanels(username, password, url, directory string) error {
 		log.Error("Failed to create a client%s\n", err)
 		return err
 	}
+	log.Info("Starting to export LibaryPanels")
 	path := filepath.Join(directory, folderName)
 	_, err = os.Stat(path)
 	if os.IsNotExist(err) {
@@ -48,6 +49,8 @@ func LibraryPanels(username, password, url, directory string) error {
 		err = os.WriteFile(filepath.Join(path, slug.Make(panel.Name))+".json", jsonLibraryPanels, os.FileMode(0666))
 		if err != nil {
 			log.Error("Couldn't write Dashboard to disk", err)
+		} else {
+			log.Info("Exported Libary Panels" + panel.Name)
 		}
 	}
 	return nil

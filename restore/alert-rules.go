@@ -25,6 +25,7 @@ func AlertRules(username, password, url, directory string) error {
 		return err
 	}
 
+	log.Info("Starting to restore alert rules")
 	path := filepath.Join(directory, folderName)
 
 	filesInDir, err = os.ReadDir(path)
@@ -47,12 +48,19 @@ func AlertRules(username, password, url, directory string) error {
 			_, err = client.AlertRule(newAlertRule.UID)
 			if err == nil {
 				err = client.UpdateAlertRule(&newAlertRule)
-				log.Error("Error updating AlertRule ", err)
-				println("update contact point")
+				if err != nil {
+					log.Error("Error updating AlertRule ", err)
+				} else {
+					log.Info("Updated AlertRule" + newAlertRule.Title)
+				}
 
 			} else {
 				_, err = client.NewAlertRule(&newAlertRule)
-				log.Error("Error creating AlertRule ", err)
+				if err != nil {
+					log.Error("Error creating AlertRule ", err)
+				} else {
+					log.Info("Created AlertRule" + newAlertRule.Title)
+				}
 			}
 		}
 	}

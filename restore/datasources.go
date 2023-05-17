@@ -24,6 +24,7 @@ func DataSources(username, password, url, directory string) error {
 		return err
 	}
 
+	log.Info("Starting to restore dataSources")
 	path := filepath.Join(directory, folderName)
 
 	filesInDir, err = os.ReadDir(path)
@@ -44,21 +45,27 @@ func DataSources(username, password, url, directory string) error {
 				continue
 			}
 			status, err := client.DataSourceByUID(newDatasource.UID)
-			if err != nil {
+			if (err != nil) && !(strings.Contains(err.Error(), "Data source not found")) {
 				log.Error("Failed Status Check if Datasource already exists")
 				continue
 			}
 			if status != nil {
-				err = client.UpdateDataSource(&newDatasource)
+				newDatasource.ID = status.ID
+				err = client.UpdateDataSourceByUID(&newDatasource)
 				if err != nil {
-					log.Error("Error updating Datasource", err)
+					log.Error("Error updating Datasource", err, "Datasource: ", newDatasource)
+				} else {
+					log.Info("Updated Datasource" + newDatasource.Name)
 				}
 
 			} else {
 				_, err = client.NewDataSource(&newDatasource)
 				if err != nil {
 					log.Error("Error creating Datasource", err)
+				} else {
+					log.Info("Created Datasource" + newDatasource.Name)
 				}
+
 			}
 		}
 	}

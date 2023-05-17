@@ -23,7 +23,7 @@ func LibraryPanels(username, password, url, directory string) error {
 		log.Error("Failed to create a client%s\n", err)
 		return err
 	}
-
+	log.Info("Starting to restore Libary Panel")
 	path := filepath.Join(directory, folderName)
 
 	filesInDir, err = os.ReadDir(path)
@@ -45,7 +45,7 @@ func LibraryPanels(username, password, url, directory string) error {
 				continue
 			}
 			status, err := client.LibraryPanelByUID(newPanel.UID)
-			if err != nil {
+			if err != nil && !(strings.Contains(err.Error(), "library element could not be found")) {
 				log.Error("Error getting UID for Library Panel", err)
 			}
 			folder, err := client.FolderByUID(newPanel.Meta.FolderUID)
@@ -54,16 +54,27 @@ func LibraryPanels(username, password, url, directory string) error {
 			}
 			newPanel.Folder = folder.ID
 			if status != nil {
-				_, err = client.PatchLibraryPanel(newPanel.UID, newPanel)
+				newPanel.Folder = folder.ID
+				newPanel.Meta.FolderUID = folder.UID
+				newPanel.Meta.FolderName = folder.Title
+				newPanel.ID = status.ID
+				newPanel.Version = 0
+				_, err := client.PatchLibraryPanel(newPanel.UID, newPanel)
 				if err != nil {
 					log.Error("Error updating Library Panel", err)
+				} else {
+					log.Info("Updated  Library Panel" + newPanel.Name)
 				}
 
 			} else {
+
 				_, err = client.NewLibraryPanel(newPanel)
 				if err != nil {
 					log.Error("Error creating Library Panel", err)
+				} else {
+					log.Info("Created  Library Panel" + newPanel.Name)
 				}
+
 			}
 		}
 	}
