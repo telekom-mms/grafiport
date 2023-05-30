@@ -43,9 +43,9 @@ func AlertRules(username, password, url, directory string) error {
 		}
 		err = os.WriteFile(filepath.Join(path, slug.Make(alertRule.Title))+".json", jsonAlertRule, os.FileMode(0666))
 		if err != nil {
-			log.Error("Couldn't write AlertRule to disk", err)
+			log.Error("Couldn't write AlertRule to disk ", err)
 		} else {
-			log.Info("Exported AlertRule" + alertRule.Title)
+			log.Info("Exported AlertRule " + alertRule.Title)
 		}
 	}
 	return nil

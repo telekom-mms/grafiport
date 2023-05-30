@@ -51,7 +51,7 @@ func AlertRules(username, password, url, directory string) error {
 				if err != nil {
 					log.Error("Error updating AlertRule ", err)
 				} else {
-					log.Info("Updated AlertRule" + newAlertRule.Title)
+					log.Info("Updated AlertRule " + newAlertRule.Title)
 				}
 
 			} else {
@@ -59,7 +59,7 @@ func AlertRules(username, password, url, directory string) error {
 				if err != nil {
 					log.Error("Error creating AlertRule ", err)
 				} else {
-					log.Info("Created AlertRule" + newAlertRule.Title)
+					log.Info("Created AlertRule " + newAlertRule.Title)
 				}
 			}
 		}
