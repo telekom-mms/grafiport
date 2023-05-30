@@ -28,12 +28,12 @@ func ContactPoints(username, password, url, directory string) error {
 	if os.IsNotExist(err) {
 		err = os.Mkdir(path, 0760)
 		if err != nil {
-			log.Fatal("Error creating directory", err)
+			log.Fatal("Error creating directory ", err)
 		}
 	}
 	contactPoints, err := client.ContactPoints()
 	if err != nil {
-		log.Error("Failed to get ContactPoints", err)
+		log.Error("Failed to get ContactPoints ", err)
 		return err
 	}
 	for _, contactPoint := range contactPoints {
@@ -42,13 +42,13 @@ func ContactPoints(username, password, url, directory string) error {
 		}
 		jsonContactPoint, err := json.Marshal(contactPoint)
 		if err != nil {
-			log.Error("Error unmarshalling json File", err)
+			log.Error("Error unmarshalling json File ", err)
 		}
 		err = os.WriteFile(filepath.Join(path, slug.Make(contactPoint.Name))+".json", jsonContactPoint, os.FileMode(0666))
 		if err != nil {
-			log.Error("Couldn't write ContactPoint to disk", err)
+			log.Error("Couldn't write ContactPoint to disk ", err)
 		} else {
-			log.Info("Exported ContactPoint" + contactPoint.Name)
+			log.Info("Exported ContactPoint " + contactPoint.Name)
 		}
 	}
 	return nil

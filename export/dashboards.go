@@ -28,28 +28,28 @@ func Dashboards(username, password, url, directory string) error {
 	if os.IsNotExist(err) {
 		err = os.Mkdir(path, 0760)
 		if err != nil {
-			log.Fatal("Error creating directory", err)
+			log.Fatal("Error creating directory ", err)
 		}
 	}
 	dashboards, err := client.Dashboards()
 	if err != nil {
-		log.Error("Failed to get Dashboards", err)
+		log.Error("Failed to get Dashboards ", err)
 		return err
 	}
 	for _, dashboard := range dashboards {
 		ds, err := client.DashboardByUID(dashboard.UID)
 		if err != nil {
-			log.Error("Error fetching Dashboard", err)
+			log.Error("Error fetching Dashboard ", err)
 		}
 		jsonDashboard, err := json.Marshal(ds)
 		if err != nil {
-			log.Error("Error unmarshalling json File", err)
+			log.Error("Error unmarshalling json File ", err)
 		}
 		err = os.WriteFile(filepath.Join(path, slug.Make(dashboard.Title))+".json", jsonDashboard, os.FileMode(0666))
 		if err != nil {
-			log.Error("Couldn't write Dashboard to disk", err)
+			log.Error("Couldn't write Dashboard to disk ", err)
 		} else {
-			log.Info("Exported Dashboard" + dashboard.Title)
+			log.Info("Exported Dashboard " + dashboard.Title)
 		}
 	}
 	return nil

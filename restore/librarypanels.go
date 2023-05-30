@@ -46,11 +46,11 @@ func LibraryPanels(username, password, url, directory string) error {
 			}
 			status, err := client.LibraryPanelByUID(newPanel.UID)
 			if err != nil && !(strings.Contains(err.Error(), "library element could not be found")) {
-				log.Error("Error getting UID for Library Panel", err)
+				log.Error("Error getting UID for Library Panel ", err)
 			}
 			folder, err := client.FolderByUID(newPanel.Meta.FolderUID)
 			if err != nil {
-				log.Error("Error getting UID for Folder in Library Panel", err)
+				log.Error("Error getting UID for Folder in Library Panel ", err)
 			}
 			newPanel.Folder = folder.ID
 			if status != nil {
@@ -61,18 +61,18 @@ func LibraryPanels(username, password, url, directory string) error {
 				newPanel.Version = 0
 				_, err := client.PatchLibraryPanel(newPanel.UID, newPanel)
 				if err != nil {
-					log.Error("Error updating Library Panel", err)
+					log.Error("Error updating Library Panel ", err)
 				} else {
-					log.Info("Updated  Library Panel" + newPanel.Name)
+					log.Info("Updated  Library Panel " + newPanel.Name)
 				}
 
 			} else {
 
 				_, err = client.NewLibraryPanel(newPanel)
 				if err != nil {
-					log.Error("Error creating Library Panel", err)
+					log.Error("Error creating Library Panel ", err)
 				} else {
-					log.Info("Created  Library Panel" + newPanel.Name)
+					log.Info("Created  Library Panel " + newPanel.Name)
 				}
 
 			}

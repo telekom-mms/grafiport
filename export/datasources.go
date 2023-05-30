@@ -25,29 +25,29 @@ func DataSources(username, password, url, directory string) error {
 	if os.IsNotExist(err) {
 		err = os.Mkdir(path, 0760)
 		if err != nil {
-			log.Fatal("Error creating directory", err)
+			log.Fatal("Error creating directory ", err)
 		}
 	}
 	dataSources, err := client.DataSources()
 	if err != nil {
-		log.Error("Failed to create search dataSources", err)
+		log.Error("Failed to create search dataSources ", err)
 		return err
 	}
 
 	for _, datasource := range dataSources {
 		ds, _ := client.DataSourceByUID(datasource.UID)
 		if err != nil {
-			log.Error("Error fetching DataSource from Grafana", err)
+			log.Error("Error fetching DataSource from Grafana ", err)
 		}
 		jsonDatasource, err := json.Marshal(ds)
 		if err != nil {
-			log.Error("Error unmarshalling json File", err)
+			log.Error("Error unmarshalling json File ", err)
 		}
 		err = os.WriteFile(filepath.Join(path, slug.Make(datasource.Name))+".json", jsonDatasource, os.FileMode(0666))
 		if err != nil {
-			log.Error("Couldn't write DataSource to disk", err)
+			log.Error("Couldn't write DataSource to disk ", err)
 		} else {
-			log.Info("Exported DataSource" + datasource.Name)
+			log.Info("Exported DataSource " + datasource.Name)
 		}
 	}
 	return nil

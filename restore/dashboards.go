@@ -53,22 +53,22 @@ func Dashboards(username, password, url, directory string) error {
 			if exists != nil {
 				err = client.DeleteDashboardByUID(uid)
 				if err != nil {
-					log.Error("Error updating Dashboard - delete (1/2)", err)
+					log.Error("Error updating Dashboard - delete (1/2) ", err)
 					continue
 				}
 				_, err = client.NewDashboard(newDB)
 				if err != nil {
-					log.Error("Error updating Dashboard - create (2/2)", err)
+					log.Error("Error updating Dashboard - create (2/2) ", err)
 					continue
 				}
-				log.Info("Updated Dashboard" + fmt.Sprint(newDB.Model["title"]))
+				log.Info("Updated Dashboard " + fmt.Sprint(newDB.Model["title"]))
 
 			} else {
 				_, err = client.NewDashboard(newDB)
 				if err != nil {
-					log.Error("Error creating Dashboard", err)
+					log.Error("Error creating Dashboard ", err)
 				} else {
-					log.Info("Created Dashboard" + fmt.Sprint(newDB.Model["title"]))
+					log.Info("Created Dashboard " + fmt.Sprint(newDB.Model["title"]))
 				}
 
 			}

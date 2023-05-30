@@ -33,23 +33,23 @@ func Folders(username, password, url, directory string) error {
 	}
 	folders, err := client.Folders()
 	if err != nil {
-		log.Error("Failed to get Folders", err)
+		log.Error("Failed to get Folders ", err)
 		return err
 	}
 	for _, folder := range folders {
 		f, err := client.FolderByUID(folder.UID)
 		if err != nil {
-			log.Error("Error fetching Folder", err)
+			log.Error("Error fetching Folder ", err)
 		}
 		jsonFolder, err := json.Marshal(f)
 		if err != nil {
-			log.Error("Error unmarshalling json File", err)
+			log.Error("Error unmarshalling json File ", err)
 		}
 		err = os.WriteFile(filepath.Join(path, slug.Make(folder.Title))+".json", jsonFolder, os.FileMode(0666))
 		if err != nil {
-			log.Error("Couldn't write Folder to disk", err)
+			log.Error("Couldn't write Folder to disk ", err)
 		} else {
-			log.Info("Exported Folder" + folder.Title)
+			log.Info("Exported Folder " + folder.Title)
 		}
 	}
 	return nil

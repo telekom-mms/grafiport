@@ -6,34 +6,87 @@ import (
 	restores "grafana-exporter/restore"
 )
 
-var err error
+var (
+	errors []error
+	err    error
+)
 
 func main() {
 	if restore {
 		err = restores.DataSources(username, password, url, directory)
+		if err != nil {
+			errors = append(errors, err)
+		}
 		err = restores.Folders(username, password, url, directory)
+		if err != nil {
+			errors = append(errors, err)
+		}
 		err = restores.LibraryPanels(username, password, url, directory)
+		if err != nil {
+			errors = append(errors, err)
+		}
 		err = restores.Dashboards(username, password, url, directory)
+		if err != nil {
+			errors = append(errors, err)
+		}
 		if alerting {
 			err = restores.AlertRules(username, password, url, directory)
+			if err != nil {
+				errors = append(errors, err)
+			}
 			err = restores.ContactPoints(username, password, url, directory)
+			if err != nil {
+				errors = append(errors, err)
+			}
 			err = restores.NotificationPolicies(username, password, url, directory)
+			if err != nil {
+				errors = append(errors, err)
+			}
+			err = restores.NotificationTemplates(username, password, url, directory)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 
-		if err != nil {
+		if errors != nil {
 			log.Error("Error in Export execution")
 		}
 	} else {
 		err = exports.DataSources(username, password, url, directory)
+		if err != nil {
+			errors = append(errors, err)
+		}
 		err = exports.Dashboards(username, password, url, directory)
+		if err != nil {
+			errors = append(errors, err)
+		}
 		err = exports.Folders(username, password, url, directory)
+		if err != nil {
+			errors = append(errors, err)
+		}
 		err = exports.LibraryPanels(username, password, url, directory)
+		if err != nil {
+			errors = append(errors, err)
+		}
 		if alerting {
 			err = exports.AlertRules(username, password, url, directory)
+			if err != nil {
+				errors = append(errors, err)
+			}
 			err = exports.ContactPoints(username, password, url, directory)
+			if err != nil {
+				errors = append(errors, err)
+			}
 			err = exports.NotificationPolicies(username, password, url, directory)
+			if err != nil {
+				errors = append(errors, err)
+			}
+			err = exports.NotificationTemplates(username, password, url, directory)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
-		if err != nil {
+		if errors != nil {
 			log.Error("Error in Restore execution")
 		}
 	}

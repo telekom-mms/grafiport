@@ -28,29 +28,29 @@ func LibraryPanels(username, password, url, directory string) error {
 	if os.IsNotExist(err) {
 		err = os.Mkdir(path, 0760)
 		if err != nil {
-			log.Fatal("Error creating directory", err)
+			log.Fatal("Error creating directory ", err)
 		}
 	}
 	libraryPanels, err := client.LibraryPanels()
 	if err != nil {
-		log.Error("Failed to get LibraryPanels", err)
+		log.Error("Failed to get LibraryPanels ", err)
 		return err
 	}
 
 	for _, panel := range libraryPanels {
 		p, _ := client.LibraryPanelByUID(panel.UID)
 		if err != nil {
-			log.Error("Error fetching LibraryPanel", err)
+			log.Error("Error fetching LibraryPanel ", err)
 		}
 		jsonLibraryPanels, err := json.Marshal(p)
 		if err != nil {
-			log.Error("Error unmarshalling json File", err)
+			log.Error("Error unmarshalling json File ", err)
 		}
 		err = os.WriteFile(filepath.Join(path, slug.Make(panel.Name))+".json", jsonLibraryPanels, os.FileMode(0666))
 		if err != nil {
-			log.Error("Couldn't write Dashboard to disk", err)
+			log.Error("Couldn't write Dashboard to disk ", err)
 		} else {
-			log.Info("Exported Libary Panels" + panel.Name)
+			log.Info("Exported Libary Panels " + panel.Name)
 		}
 	}
 	return nil
