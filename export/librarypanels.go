@@ -10,6 +10,11 @@ import (
 	"path/filepath"
 )
 
+// LibraryPanels is a function that exports all folders from a Grafana instance and stores them as JSON files in a directory.
+// The function takes four parameters: username, password, url and directory.
+// username and password are the credentials for the Grafana instance.
+// url is the base URL of the Grafana instance.
+// directory is the path of the directory where the dashboards will be stored.
 func LibraryPanels(username, password, url, directory string) error {
 	var (
 		err error
@@ -22,7 +27,7 @@ func LibraryPanels(username, password, url, directory string) error {
 		log.Error("Failed to create a client%s\n", err)
 		return err
 	}
-	log.Info("Starting to export LibaryPanels")
+	log.Info("Starting to export LibraryPanels")
 	path := filepath.Join(directory, folderName)
 	_, err = os.Stat(path)
 	if os.IsNotExist(err) {
@@ -50,7 +55,7 @@ func LibraryPanels(username, password, url, directory string) error {
 		if err != nil {
 			log.Error("Couldn't write Dashboard to disk ", err)
 		} else {
-			log.Info("Exported Libary Panels " + panel.Name)
+			log.Info("Exported Library Panels " + panel.Name)
 		}
 	}
 	return nil

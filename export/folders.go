@@ -10,6 +10,11 @@ import (
 	"path/filepath"
 )
 
+// Folders is a function that exports all folders from a Grafana instance and stores them as JSON files in a directory.
+// The function takes four parameters: username, password, url and directory.
+// username and password are the credentials for the Grafana instance.
+// url is the base URL of the Grafana instance.
+// directory is the path of the directory where the dashboards will be stored.
 func Folders(username, password, url, directory string) error {
 	var (
 		err error

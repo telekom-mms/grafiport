@@ -10,6 +10,11 @@ import (
 	"path/filepath"
 )
 
+// ContactPoints is a function that exports all contact points from a Grafana instance and stores them as JSON files in a directory.
+// The function takes four parameters: username, password, url and directory.
+// username and password are the credentials for the Grafana instance.
+// url is the base URL of the Grafana instance.
+// directory is the path of the directory where the dashboards will be stored.
 func ContactPoints(username, password, url, directory string) error {
 	var (
 		err error
