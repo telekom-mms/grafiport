@@ -4,8 +4,7 @@ import (
 	"encoding/json"
 	"github.com/charmbracelet/log"
 	"github.com/gosimple/slug"
-	gapi "github.com/grafana/grafana-api-golang-client"
-	url2 "net/url"
+	"grafana-exporter/common"
 	"os"
 	"path/filepath"
 )
@@ -20,38 +19,29 @@ func AlertRules(username, password, url, directory string) error {
 		err error
 	)
 	folderName := "alertRules"
-	userInfo := url2.UserPassword(username, password)
-	config := gapi.Config{BasicAuth: userInfo}
-	client, err := gapi.New(url, config)
+	path := common.InitializeFolder(directory, folderName)          // initialize Sub-folder to export to it
+	client, err := common.InitializeClient(username, password, url) // initialize gapi Client
 	if err != nil {
-		log.Error("Failed to create a client%s\n", err)
+		log.Error("Failed to create gapi client", err)
 		return err
 	}
-	log.Info("Starting to export AlertRules")
-	path := filepath.Join(directory, folderName)
-	_, err = os.Stat(path)
-	if os.IsNotExist(err) {
-		err = os.Mkdir(path, 0760)
-		if err != nil {
-			log.Fatal("Error creating directory", err)
-		}
-	}
-	alertRules, err := client.AlertRules()
+	alertRules, err := client.AlertRules() //Get slice of all AlertRules
 	if err != nil {
 		log.Error("Failed to get AlertRules", err)
 		return err
 	}
+	// iterate over all AlertRules to be consistent with all other objects
 	for _, alertRule := range alertRules {
-		jsonAlertRule, err := json.Marshal(alertRule)
+		jsonAlertRule, err := json.Marshal(alertRule) // Create JSON Object of AlertRule from received Bytes
 		if err != nil {
 			log.Error("Error unmarshalling json File", err)
 		}
-		err = os.WriteFile(filepath.Join(path, slug.Make(alertRule.Title))+".json", jsonAlertRule, os.FileMode(0666))
+		// write Dashboards as json to a File
+		err = os.WriteFile(filepath.Join(path, slug.Make(alertRule.Title+" "+alertRule.UID)+".json"), jsonAlertRule, os.FileMode(0666)) // Make sure Name of File is unique, Filemode is irrelevant, but required for Writefile
 		if err != nil {
 			log.Error("Couldn't write AlertRule to disk ", err)
-		} else {
-			log.Info("Exported AlertRule " + alertRule.Title)
 		}
+		log.Info("Exported AlertRule " + alertRule.Title)
 	}
 	return nil
 }

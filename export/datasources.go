@@ -4,8 +4,7 @@ import (
 	"encoding/json"
 	"github.com/charmbracelet/log"
 	"github.com/gosimple/slug"
-	gapi "github.com/grafana/grafana-api-golang-client"
-	url2 "net/url"
+	"grafana-exporter/common"
 	"os"
 	"path/filepath"
 )
@@ -16,44 +15,35 @@ import (
 // url is the base URL of the Grafana instance.
 // directory is the path of the directory where the dashboards will be stored.
 func DataSources(username, password, url, directory string) error {
-	folderName := "dataSources"
-	userInfo := url2.UserPassword(username, password)
-	config := gapi.Config{BasicAuth: userInfo}
-	client, err := gapi.New(url, config)
+	folderName := "dataSources" //Name of sub-folder
+
+	log.Info("Starting to export DataSource")
+	path := common.InitializeFolder(directory, folderName)          // initialize Subfolder to export to it
+	client, err := common.InitializeClient(username, password, url) // initialize gapi Client
 	if err != nil {
-		log.Error("Failed to create a client%s\n", err)
+		log.Error("Failed to create gapi client", err)
 		return err
 	}
-	log.Info("Starting to export DataSource")
-	path := filepath.Join(directory, folderName)
-	_, err = os.Stat(path)
-	if os.IsNotExist(err) {
-		err = os.Mkdir(path, 0760)
-		if err != nil {
-			log.Fatal("Error creating directory ", err)
-		}
-	}
-	dataSources, err := client.DataSources()
+	dataSources, err := client.DataSources() //Get slice of all DataSources in a short version
 	if err != nil {
 		log.Error("Failed to create search dataSources ", err)
 		return err
 	}
-
+	// iterate over all DataSources
 	for _, datasource := range dataSources {
-		ds, _ := client.DataSourceByUID(datasource.UID)
+		ds, _ := client.DataSourceByUID(datasource.UID) // request the Datasource by UID to get the complete Config
 		if err != nil {
 			log.Error("Error fetching DataSource from Grafana ", err)
 		}
-		jsonDatasource, err := json.Marshal(ds)
+		jsonDatasource, err := json.Marshal(ds) // create JSON Object from Datasource
 		if err != nil {
 			log.Error("Error unmarshalling json File ", err)
 		}
-		err = os.WriteFile(filepath.Join(path, slug.Make(datasource.Name))+".json", jsonDatasource, os.FileMode(0666))
+		err = os.WriteFile(filepath.Join(path, slug.Make(datasource.Name+" "+datasource.UID)+".json"), jsonDatasource, os.FileMode(0666)) // Make sure Name of File is unique, Filemode is irrelevant, but required for Writefile
 		if err != nil {
 			log.Error("Couldn't write DataSource to disk ", err)
-		} else {
-			log.Info("Exported DataSource " + datasource.Name)
 		}
+		log.Info("Exported DataSource " + datasource.Name)
 	}
 	return nil
 }

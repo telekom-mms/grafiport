@@ -4,9 +4,17 @@ In addition to this it can restore the config from the Files and import them bac
 
 ## Installation
 
-## Documentation
+### Docker
+
+### non Container environment
 
 ## Usage
+
+
+
+## Documentation
+
+
 
 
 ## Useful Information

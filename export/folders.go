@@ -4,8 +4,7 @@ import (
 	"encoding/json"
 	"github.com/charmbracelet/log"
 	"github.com/gosimple/slug"
-	gapi "github.com/grafana/grafana-api-golang-client"
-	url2 "net/url"
+	"grafana-exporter/common"
 	"os"
 	"path/filepath"
 )
@@ -20,42 +19,35 @@ func Folders(username, password, url, directory string) error {
 		err error
 	)
 	folderName := "folders"
-	userInfo := url2.UserPassword(username, password)
-	config := gapi.Config{BasicAuth: userInfo}
-	client, err := gapi.New(url, config)
+	path := common.InitializeFolder(directory, folderName)          // initialize Subfolder to export to it
+	client, err := common.InitializeClient(username, password, url) // initialize gapi Client
 	if err != nil {
-		log.Error("Failed to create a client%s\n", err)
+		log.Error("Failed to create gapi client", err)
 		return err
 	}
-	log.Info("Starting to export Folders")
-	path := filepath.Join(directory, folderName)
-	_, err = os.Stat(path)
-	if os.IsNotExist(err) {
-		err = os.Mkdir(path, 0760)
-		if err != nil {
-			log.Fatal("Error creating directory", err)
-		}
-	}
+	//Get slice of all Folders in a short version
 	folders, err := client.Folders()
 	if err != nil {
 		log.Error("Failed to get Folders ", err)
 		return err
 	}
+	// iterate over Folder Slice
 	for _, folder := range folders {
+		// Get slice of the current folder by UID.
+		// UID is in this case the Identifier
 		f, err := client.FolderByUID(folder.UID)
 		if err != nil {
 			log.Error("Error fetching Folder ", err)
 		}
-		jsonFolder, err := json.Marshal(f)
+		jsonFolder, err := json.Marshal(f) // create JSON Object from Folder
 		if err != nil {
 			log.Error("Error unmarshalling json File ", err)
 		}
-		err = os.WriteFile(filepath.Join(path, slug.Make(folder.Title))+".json", jsonFolder, os.FileMode(0666))
+		err = os.WriteFile(filepath.Join(path, slug.Make(folder.Title+" "+folder.UID)+".json"), jsonFolder, os.FileMode(0666)) // Make sure Name of File is unique, Filemode is irrelevant, but required for Writefile
 		if err != nil {
 			log.Error("Couldn't write Folder to disk ", err)
-		} else {
-			log.Info("Exported Folder " + folder.Title)
 		}
+		log.Info("Exported Folder " + folder.Title)
 	}
 	return nil
 }

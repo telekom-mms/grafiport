@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/charmbracelet/log"
 	gapi "github.com/grafana/grafana-api-golang-client"
-	url2 "net/url"
+	"grafana-exporter/common"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,11 +18,9 @@ func Dashboards(username, password, url, directory string) error {
 		rawDB      []byte
 	)
 	folderName := "dashboards"
-	userInfo := url2.UserPassword(username, password)
-	config := gapi.Config{BasicAuth: userInfo}
-	client, err := gapi.New(url, config)
+	client, err := common.InitializeClient(username, password, url) // initialize gapi Client
 	if err != nil {
-		log.Error("Failed to create a client%s\n", err)
+		log.Error("Failed to create gapi client", err)
 		return err
 	}
 

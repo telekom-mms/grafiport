@@ -2,9 +2,9 @@ package main
 
 import (
 	"flag"
-	"os"
-
 	"github.com/charmbracelet/log"
+	"os"
+	"strconv"
 )
 
 var (
@@ -43,7 +43,13 @@ func init() {
 		url = os.Getenv("url")
 	}
 	if directory == "" {
-		directory = os.Getenv("DIRECTORY")
+		directory = os.Getenv("directory")
+	}
+	if alerting == false {
+		alerting = getenvBool("alerting")
+	}
+	if restore == false {
+		restore = getenvBool("restore")
 	}
 	info, err := os.Stat(directory)
 	if os.IsNotExist(err) {
@@ -53,4 +59,16 @@ func init() {
 	if !info.IsDir() {
 		log.Fatal("Path is not a directory.")
 	}
+}
+
+func getenvBool(key string) bool {
+	value := os.Getenv(key)
+	if value == "" {
+		return false
+	}
+	binary, err := strconv.ParseBool(value)
+	if err != nil {
+		log.Fatal("Not able to parse Boolean ", key)
+	}
+	return binary
 }
