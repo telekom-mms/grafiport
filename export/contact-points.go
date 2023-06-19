@@ -19,7 +19,7 @@ func ContactPoints(username, password, url, directory string) error {
 		err error
 	)
 	folderName := "contactPoints"
-	path := common.InitializeFolder(directory, folderName)          // initialize Subfolder to export to it
+	path := common.InitializeFolder(directory, folderName)          // initialize Sub-folder to export to it
 	client, err := common.InitializeClient(username, password, url) // initialize gapi Client
 	if err != nil {
 		log.Error("Failed to create gapi client", err)
@@ -39,7 +39,7 @@ func ContactPoints(username, password, url, directory string) error {
 		if err != nil {
 			log.Error("Error unmarshalling json File ", err)
 		}
-		err = os.WriteFile(filepath.Join(path, slug.Make(contactPoint.Name+" "+contactPoint.UID)+".json"), jsonContactPoint, os.FileMode(0666)) // Make sure Name of File is unique, Filemode is irrelevant, but required for Writefile
+		err = os.WriteFile(filepath.Join(path, slug.Make(contactPoint.Name+" "+contactPoint.UID)+".json"), jsonContactPoint, os.FileMode(0666)) // Make sure filename is unique, FileMode is irrelevant, but required for WriteFile
 		if err != nil {
 			log.Error("Couldn't write ContactPoint to disk ", err)
 		}

@@ -37,7 +37,7 @@ func AlertRules(username, password, url, directory string) error {
 			log.Error("Error unmarshalling json File", err)
 		}
 		// write Dashboards as json to a File
-		err = os.WriteFile(filepath.Join(path, slug.Make(alertRule.Title+" "+alertRule.UID)+".json"), jsonAlertRule, os.FileMode(0666)) // Make sure Name of File is unique, Filemode is irrelevant, but required for Writefile
+		err = os.WriteFile(filepath.Join(path, slug.Make(alertRule.Title+" "+alertRule.UID)+".json"), jsonAlertRule, os.FileMode(0666)) // Make sure filename is unique, FileMode is irrelevant, but required for WriteFile
 		if err != nil {
 			log.Error("Couldn't write AlertRule to disk ", err)
 		}

@@ -10,6 +10,11 @@ import (
 	"strings"
 )
 
+// AlertRules is a function that restores all alert rules to a Grafana instance from a given folder
+// The function takes four parameters: username, password, url and directory.
+// username and password are the credentials for the Grafana instance.
+// url is the base URL of the Grafana instance.
+// directory is the path of the directory where the dashboards will be stored.
 func AlertRules(username, password, url, directory string) error {
 	var (
 		filesInDir   []os.DirEntry
