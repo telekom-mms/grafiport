@@ -11,6 +11,7 @@ RUN go mod download
 WORKDIR /go/src/grafana-exporter
 ADD export export
 ADD restore restore
+ADD common common
 COPY *.go /go/src/grafana-exporter/
 WORKDIR /go/src/grafana-exporter
 RUN go build -o grafana-exporter
