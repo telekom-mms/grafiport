@@ -1,6 +1,7 @@
 # Grafiport
 This is a Tool to export Grafana objects and store them in JSON Files the filesystem.
 In addition to this it can restore the config from the Files and import them back into Grafana.
+Restoring of Objects will either update the config if existent or create all new object.
 
 ## Usage/Installation
 

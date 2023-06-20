@@ -29,14 +29,17 @@ func AlertRules(username, password, url, directory string) error {
 	}
 
 	log.Info("Starting to restore alert rules")
+	// path is the based on a provided directory and the naming of sub-folder os our tool
 	path := filepath.Join(directory, folderName)
-
+	// get all files in provided path
 	filesInDir, err = os.ReadDir(path)
 	if err != nil {
 		log.Error("Failed to read alert rules%s\n", err)
 	}
+	// looping over found files to restore
 	for _, file := range filesInDir {
 		if strings.HasSuffix(file.Name(), ".json") {
+			// read in files to json and Unmarshall them to be Object
 			if rawAlertRule, err = os.ReadFile(filepath.Join(path, file.Name())); err != nil {
 				log.Error(err)
 				continue
@@ -47,23 +50,25 @@ func AlertRules(username, password, url, directory string) error {
 				log.Error(err)
 				continue
 			}
-
+			// interact with api
+			// search for alertRule if exists to determine if update or create
+			// if no error then object exists
 			_, err = client.AlertRule(newAlertRule.UID)
 			if err == nil {
 				err = client.UpdateAlertRule(&newAlertRule)
 				if err != nil {
 					log.Error("Error updating AlertRule ", err)
-				} else {
-					log.Info("Updated AlertRule " + newAlertRule.Title)
+					break
 				}
+				log.Info("Updated AlertRule " + newAlertRule.Title)
 
 			} else {
 				_, err = client.NewAlertRule(&newAlertRule)
 				if err != nil {
 					log.Error("Error creating AlertRule ", err)
-				} else {
-					log.Info("Created AlertRule " + newAlertRule.Title)
+					break
 				}
+				log.Info("Created AlertRule " + newAlertRule.Title)
 			}
 		}
 	}
