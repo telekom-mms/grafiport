@@ -2,9 +2,9 @@ package main
 
 import (
 	"flag"
-	"os"
-
 	"github.com/charmbracelet/log"
+	"os"
+	"strconv"
 )
 
 var (
@@ -22,9 +22,9 @@ func init() {
 	flag.StringVar(&password, "p", "", "Password for Grafana Instance")
 	flag.StringVar(&url, "url", "", "Baseurl for your Grafana Instance.")
 	flag.StringVar(&directory, "directory", "", "Directory where Output/Input is stored")
-	flag.BoolVar(&help, "h", false, "Die Hilfe")
-	flag.BoolVar(&restore, "r", false, "Der Restore von erstellten Backups")
-	flag.BoolVar(&alerting, "alerting", false, "Export Restore der Alerting Objekte wie Alert Rules, Contact points, Notification policies mit einschließen")
+	flag.BoolVar(&help, "h", false, "The Help")
+	flag.BoolVar(&restore, "r", false, "Restore of provided backup Directory")
+	flag.BoolVar(&alerting, "alerting", false, "Export or Restore of the Alerting Objects including Alert Rules, Contact Point, Notification Policies and Notification Templates")
 
 	flag.Parse()
 
@@ -43,7 +43,13 @@ func init() {
 		url = os.Getenv("url")
 	}
 	if directory == "" {
-		directory = os.Getenv("DIRECTORY")
+		directory = os.Getenv("directory")
+	}
+	if alerting == false {
+		alerting = getEnvBool("alerting")
+	}
+	if restore == false {
+		restore = getEnvBool("restore")
 	}
 	info, err := os.Stat(directory)
 	if os.IsNotExist(err) {
@@ -53,4 +59,16 @@ func init() {
 	if !info.IsDir() {
 		log.Fatal("Path is not a directory.")
 	}
+}
+
+func getEnvBool(key string) bool {
+	value := os.Getenv(key)
+	if value == "" {
+		return false
+	}
+	binary, err := strconv.ParseBool(value)
+	if err != nil {
+		log.Fatal("Not able to parse Boolean ", key)
+	}
+	return binary
 }

@@ -4,12 +4,17 @@ import (
 	"encoding/json"
 	"github.com/charmbracelet/log"
 	gapi "github.com/grafana/grafana-api-golang-client"
-	url2 "net/url"
+	"grafana-exporter/common"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
+// AlertRules is a function that restores all alert rules to a Grafana instance from a given folder
+// The function takes four parameters: username, password, url and directory.
+// username and password are the credentials for the Grafana instance.
+// url is the base URL of the Grafana instance.
+// directory is the path of the directory where the dashboards will be stored.
 func AlertRules(username, password, url, directory string) error {
 	var (
 		filesInDir   []os.DirEntry
@@ -17,23 +22,24 @@ func AlertRules(username, password, url, directory string) error {
 		err          error
 	)
 	folderName := "alertRules"
-	userInfo := url2.UserPassword(username, password)
-	config := gapi.Config{BasicAuth: userInfo}
-	client, err := gapi.New(url, config)
+	client, err := common.InitializeClient(username, password, url) // initialize gapi Client
 	if err != nil {
-		log.Error("Failed to create a client%s\n", err)
+		log.Error("Failed to create gapi client", err)
 		return err
 	}
 
 	log.Info("Starting to restore alert rules")
+	// path is the based on a provided directory and the naming of sub-folder os our tool
 	path := filepath.Join(directory, folderName)
-
+	// get all files in provided path
 	filesInDir, err = os.ReadDir(path)
 	if err != nil {
 		log.Error("Failed to read alert rules%s\n", err)
 	}
+	// looping over found files to restore
 	for _, file := range filesInDir {
 		if strings.HasSuffix(file.Name(), ".json") {
+			// read in files to json and Unmarshall them to be Object
 			if rawAlertRule, err = os.ReadFile(filepath.Join(path, file.Name())); err != nil {
 				log.Error(err)
 				continue
@@ -44,23 +50,25 @@ func AlertRules(username, password, url, directory string) error {
 				log.Error(err)
 				continue
 			}
-
+			// interact with api
+			// search for alertRule if exists to determine if update or create
+			// if no error then object exists
 			_, err = client.AlertRule(newAlertRule.UID)
 			if err == nil {
 				err = client.UpdateAlertRule(&newAlertRule)
 				if err != nil {
 					log.Error("Error updating AlertRule ", err)
-				} else {
-					log.Info("Updated AlertRule " + newAlertRule.Title)
+					break
 				}
+				log.Info("Updated AlertRule " + newAlertRule.Title)
 
 			} else {
 				_, err = client.NewAlertRule(&newAlertRule)
 				if err != nil {
 					log.Error("Error creating AlertRule ", err)
-				} else {
-					log.Info("Created AlertRule " + newAlertRule.Title)
+					break
 				}
+				log.Info("Created AlertRule " + newAlertRule.Title)
 			}
 		}
 	}

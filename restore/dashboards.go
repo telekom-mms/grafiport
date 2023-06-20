@@ -5,12 +5,17 @@ import (
 	"fmt"
 	"github.com/charmbracelet/log"
 	gapi "github.com/grafana/grafana-api-golang-client"
-	url2 "net/url"
+	"grafana-exporter/common"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
+// Dashboards is a function that restores all dashboards to a Grafana instance from a given folder
+// The function takes four parameters: username, password, url and directory.
+// username and password are the credentials for the Grafana instance.
+// url is the base URL of the Grafana instance.
+// directory is the path of the directory where the dashboards will be stored.
 func Dashboards(username, password, url, directory string) error {
 
 	var (
@@ -18,24 +23,25 @@ func Dashboards(username, password, url, directory string) error {
 		rawDB      []byte
 	)
 	folderName := "dashboards"
-	userInfo := url2.UserPassword(username, password)
-	config := gapi.Config{BasicAuth: userInfo}
-	client, err := gapi.New(url, config)
+	client, err := common.InitializeClient(username, password, url) // initialize gapi Client
 	if err != nil {
-		log.Error("Failed to create a client%s\n", err)
+		log.Error("Failed to create gapi client", err)
 		return err
 	}
 
 	log.Info("Starting to restore Dashboards")
+	// path is the based on a provided directory and the naming of sub-folder os our tool
 	path := filepath.Join(directory, folderName)
-
+	// get all files in provided path
 	filesInDir, err = os.ReadDir(path)
 	if err != nil {
 		log.Error("Failed to read folder%s\n", err)
 		return err
 	}
+	// looping over found files to restore
 	for _, file := range filesInDir {
 		if strings.HasSuffix(file.Name(), ".json") {
+			// read in files to json and Unmarshall them to be Object
 			if rawDB, err = os.ReadFile(filepath.Join(path, file.Name())); err != nil {
 				log.Error(err)
 				continue
@@ -46,11 +52,18 @@ func Dashboards(username, password, url, directory string) error {
 				log.Error(err)
 				continue
 			}
+			// setting some fields in order to correctly restore the object
+			// FolderID and ID of the Dashboard are controlled by the Grafana Instance so not unique enough
 			newDB.Model["id"] = ""
 			newDB.FolderID = 0
+			// uid is sometimes missing in the Export Object, so set here
 			uid := fmt.Sprint(newDB.Model["uid"])
+			// interact with api
+			// search for alertRule if exists to determine if update or create
+			// if no error then object exists
 			exists, _ := client.DashboardByUID(uid)
 			if exists != nil {
+				// library misses Update Function, so implemented by deleting and creating the new Config
 				err = client.DeleteDashboardByUID(uid)
 				if err != nil {
 					log.Error("Error updating Dashboard - delete (1/2) ", err)
