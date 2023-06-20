@@ -27,7 +27,7 @@ func LibraryPanels(username, password, url, directory string) error {
 		return err
 	}
 
-	log.Info("Starting to restore Libary Panel")
+	log.Info("Starting to restore Library Panel")
 	// path is the based on a provided directory and the naming of sub-folder os our tool
 	path := filepath.Join(directory, folderName)
 	// get all files in provided path

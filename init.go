@@ -22,9 +22,9 @@ func init() {
 	flag.StringVar(&password, "p", "", "Password for Grafana Instance")
 	flag.StringVar(&url, "url", "", "Baseurl for your Grafana Instance.")
 	flag.StringVar(&directory, "directory", "", "Directory where Output/Input is stored")
-	flag.BoolVar(&help, "h", false, "Die Hilfe")
-	flag.BoolVar(&restore, "r", false, "Der Restore von erstellten Backups")
-	flag.BoolVar(&alerting, "alerting", false, "Export Restore der Alerting Objekte wie Alert Rules, Contact points, Notification policies mit einschließen")
+	flag.BoolVar(&help, "h", false, "The Help")
+	flag.BoolVar(&restore, "r", false, "Restore of provided backup Directory")
+	flag.BoolVar(&alerting, "alerting", false, "Export or Restore of the Alerting Objects including Alert Rules, Contact Point, Notification Policies and Notification Templates")
 
 	flag.Parse()
 
@@ -46,10 +46,10 @@ func init() {
 		directory = os.Getenv("directory")
 	}
 	if alerting == false {
-		alerting = getenvBool("alerting")
+		alerting = getEnvBool("alerting")
 	}
 	if restore == false {
-		restore = getenvBool("restore")
+		restore = getEnvBool("restore")
 	}
 	info, err := os.Stat(directory)
 	if os.IsNotExist(err) {
@@ -61,7 +61,7 @@ func init() {
 	}
 }
 
-func getenvBool(key string) bool {
+func getEnvBool(key string) bool {
 	value := os.Getenv(key)
 	if value == "" {
 		return false
