@@ -1,12 +1,9 @@
 package export
 
 import (
-	"encoding/json"
 	"github.com/charmbracelet/log"
 	"github.com/gosimple/slug"
 	"grafana-exporter/common"
-	"os"
-	"path/filepath"
 )
 
 // NotificationTemplates is a function that exports all templates for notifications from a Grafana instance and stores them as JSON files in a directory.
@@ -38,12 +35,7 @@ func NotificationTemplates(username, password, url, directory string) error {
 		if err != nil {
 			log.Error("Error fetching NotificationTemplate ", err)
 		}
-		jsonNotificationTemplates, err := json.Marshal(t) // create JSON Object
-		if err != nil {
-			log.Error("Error unmarshalling json File ", err)
-		}
-		// write Templates as json to file
-		err = os.WriteFile(filepath.Join(path, slug.Make(template.Name)+".json"), jsonNotificationTemplates, os.FileMode(0666)) // Make sure filename is unique, FileMode is irrelevant, but required for WriteFile
+		err = common.WriteObjectToDisk(t, path, slug.Make(t.Name)+".json")
 		if err != nil {
 			log.Error("Couldn't write NotificationTemplates to disk ", err)
 		}

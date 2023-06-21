@@ -1,13 +1,10 @@
 package restore
 
 import (
-	"encoding/json"
 	"github.com/charmbracelet/log"
 	gapi "github.com/grafana/grafana-api-golang-client"
 	"grafana-exporter/common"
-	"os"
 	"path/filepath"
-	"strings"
 )
 
 // NotificationTemplates is a function that restores all notification templates to a Grafana instance from a given folder
@@ -17,8 +14,7 @@ import (
 // directory is the path of the directory where the dashboards will be stored.
 func NotificationTemplates(username, password, url, directory string) error {
 	var (
-		filesInDir  []os.DirEntry
-		rawTemplate []byte
+		err error
 	)
 	folderName := "notificationTemplates"
 	client, err := common.InitializeClient(username, password, url) // initialize gapi Client
@@ -29,55 +25,42 @@ func NotificationTemplates(username, password, url, directory string) error {
 	log.Info("Starting to restore NotificationTemplates")
 	// path is the based on a provided directory and the naming of sub-folder os our tool
 	path := filepath.Join(directory, folderName)
-	// get all files in provided path
-	filesInDir, err = os.ReadDir(path)
+	// get all objects from provided path
+	AlertingMessageTemplatesSlice, err := common.ReadObjectsFromDisk[gapi.AlertingMessageTemplate](path)
 	if err != nil {
-		log.Error("Failed to read folder%s\n", err)
+		log.Error("Error reading AlertRules from Disk")
 		return err
 	}
 	// looping over found files to restore
-	for _, file := range filesInDir {
-		if strings.HasSuffix(file.Name(), ".json") {
-			// read in files to json and Unmarshall them to be Object
-			if rawTemplate, err = os.ReadFile(filepath.Join(path, file.Name())); err != nil {
-				log.Error(err)
-				continue
+	for _, newTemplate := range AlertingMessageTemplatesSlice {
+		// interact with api
+		// search for alertRule if exists to determine if update or create
+		// if no error then object exists
+		status, _ := client.MessageTemplate(newTemplate.Name)
+		if status.Name != "" {
+			// library misses Update Function, so implemented by deleting and overwriting the new Config
+			err = client.DeleteMessageTemplate(newTemplate.Name)
+			if err != nil {
+				log.Error("Error updating NotificationTemplate - delete (1/2) ", err)
+				break
 			}
-
-			var newTemplate gapi.AlertingMessageTemplate
-			if err = json.Unmarshal(rawTemplate, &newTemplate); err != nil {
-				log.Error(err)
-				continue
+			err = client.SetMessageTemplate(newTemplate.Name, newTemplate.Template)
+			if err != nil {
+				log.Error("Error updating NotificationTemplate - set (2/2) ", err)
+				break
 			}
-			// interact with api
-			// search for alertRule if exists to determine if update or create
-			// if no error then object exists
-			status, _ := client.MessageTemplate(newTemplate.Name)
-			if status.Name != "" {
-				// library misses Update Function, so implemented by deleting and overwriting the new Config
-				err = client.DeleteMessageTemplate(newTemplate.Name)
-				if err != nil {
-					log.Error("Error updating NotificationTemplate - delete (1/2) ", err)
-					break
-				}
-				err = client.SetMessageTemplate(newTemplate.Name, newTemplate.Template)
-				if err != nil {
-					log.Error("Error updating NotificationTemplate - set (2/2) ", err)
-					break
-				}
-				log.Info("Updated NotificationTemplate " + newTemplate.Name)
+			log.Info("Updated NotificationTemplate " + newTemplate.Name)
 
-			} else {
-				err = client.SetMessageTemplate(newTemplate.Name, newTemplate.Template)
-				if err != nil {
-					log.Error("Error creating NotificationTemplate ", err)
-					break
-				}
-				log.Info("Created NotificationTemplate " + newTemplate.Name)
-
+		} else {
+			err = client.SetMessageTemplate(newTemplate.Name, newTemplate.Template)
+			if err != nil {
+				log.Error("Error creating NotificationTemplate ", err)
+				break
 			}
+			log.Info("Created NotificationTemplate " + newTemplate.Name)
 
 		}
+
 	}
 	return nil
 }

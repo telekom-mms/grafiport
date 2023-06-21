@@ -1,12 +1,9 @@
 package export
 
 import (
-	"encoding/json"
 	"github.com/charmbracelet/log"
 	"github.com/gosimple/slug"
 	"grafana-exporter/common"
-	"os"
-	"path/filepath"
 )
 
 // ContactPoints is a function that exports all contact points from a Grafana instance and stores them as JSON files in a directory.
@@ -35,11 +32,7 @@ func ContactPoints(username, password, url, directory string) error {
 		if contactPoint.UID == "" {
 			continue
 		}
-		jsonContactPoint, err := json.Marshal(contactPoint) // Create JSON Object of ContactPoint from received Bytes
-		if err != nil {
-			log.Error("Error unmarshalling json File ", err)
-		}
-		err = os.WriteFile(filepath.Join(path, slug.Make(contactPoint.Name+" "+contactPoint.UID)+".json"), jsonContactPoint, os.FileMode(0666)) // Make sure filename is unique, FileMode is irrelevant, but required for WriteFile
+		err = common.WriteObjectToDisk(contactPoint, path, slug.Make(contactPoint.Name+" "+contactPoint.UID)+".json")
 		if err != nil {
 			log.Error("Couldn't write ContactPoint to disk ", err)
 		}

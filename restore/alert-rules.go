@@ -1,13 +1,10 @@
 package restore
 
 import (
-	"encoding/json"
 	"github.com/charmbracelet/log"
 	gapi "github.com/grafana/grafana-api-golang-client"
 	"grafana-exporter/common"
-	"os"
 	"path/filepath"
-	"strings"
 )
 
 // AlertRules is a function that restores all alert rules to a Grafana instance from a given folder
@@ -17,9 +14,7 @@ import (
 // directory is the path of the directory where the dashboards will be stored.
 func AlertRules(username, password, url, directory string) error {
 	var (
-		filesInDir   []os.DirEntry
-		rawAlertRule []byte
-		err          error
+		err error
 	)
 	folderName := "alertRules"
 	client, err := common.InitializeClient(username, password, url) // initialize gapi Client
@@ -31,45 +26,33 @@ func AlertRules(username, password, url, directory string) error {
 	log.Info("Starting to restore alert rules")
 	// path is the based on a provided directory and the naming of sub-folder os our tool
 	path := filepath.Join(directory, folderName)
-	// get all files in provided path
-	filesInDir, err = os.ReadDir(path)
+	// get all objects from provided path
+	AlertRuleSlice, err := common.ReadObjectsFromDisk[gapi.AlertRule](path)
 	if err != nil {
-		log.Error("Failed to read alert rules%s\n", err)
+		log.Error("Error reading AlertRules from Disk")
+		return err
 	}
 	// looping over found files to restore
-	for _, file := range filesInDir {
-		if strings.HasSuffix(file.Name(), ".json") {
-			// read in files to json and Unmarshall them to be Object
-			if rawAlertRule, err = os.ReadFile(filepath.Join(path, file.Name())); err != nil {
-				log.Error(err)
-				continue
+	for _, newAlertRule := range AlertRuleSlice {
+		// interact with api
+		// search for alertRule if exists to determine if update or create
+		// if no error then object exists
+		_, err = client.AlertRule(newAlertRule.UID)
+		if err == nil {
+			err = client.UpdateAlertRule(&newAlertRule)
+			if err != nil {
+				log.Error("Error updating AlertRule ", err)
+				break
 			}
+			log.Info("Updated AlertRule " + newAlertRule.Title)
 
-			var newAlertRule gapi.AlertRule
-			if err = json.Unmarshal(rawAlertRule, &newAlertRule); err != nil {
-				log.Error(err)
-				continue
+		} else {
+			_, err = client.NewAlertRule(&newAlertRule)
+			if err != nil {
+				log.Error("Error creating AlertRule ", err)
+				break
 			}
-			// interact with api
-			// search for alertRule if exists to determine if update or create
-			// if no error then object exists
-			_, err = client.AlertRule(newAlertRule.UID)
-			if err == nil {
-				err = client.UpdateAlertRule(&newAlertRule)
-				if err != nil {
-					log.Error("Error updating AlertRule ", err)
-					break
-				}
-				log.Info("Updated AlertRule " + newAlertRule.Title)
-
-			} else {
-				_, err = client.NewAlertRule(&newAlertRule)
-				if err != nil {
-					log.Error("Error creating AlertRule ", err)
-					break
-				}
-				log.Info("Created AlertRule " + newAlertRule.Title)
-			}
+			log.Info("Created AlertRule " + newAlertRule.Title)
 		}
 	}
 	return err

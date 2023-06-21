@@ -1,12 +1,9 @@
 package export
 
 import (
-	"encoding/json"
 	"github.com/charmbracelet/log"
 	"github.com/gosimple/slug"
 	"grafana-exporter/common"
-	"os"
-	"path/filepath"
 )
 
 // AlertRules is a function that exports all alert rules from a Grafana instance and stores them as JSON files in a directory.
@@ -32,12 +29,7 @@ func AlertRules(username, password, url, directory string) error {
 	}
 	// iterate over all AlertRules to be consistent with all other objects
 	for _, alertRule := range alertRules {
-		jsonAlertRule, err := json.Marshal(alertRule) // Create JSON Object of AlertRule from received Bytes
-		if err != nil {
-			log.Error("Error unmarshalling json File", err)
-		}
-		// write Dashboards as json to a File
-		err = os.WriteFile(filepath.Join(path, slug.Make(alertRule.Title+" "+alertRule.UID)+".json"), jsonAlertRule, os.FileMode(0666)) // Make sure filename is unique, FileMode is irrelevant, but required for WriteFile
+		err = common.WriteObjectToDisk(alertRule, path, slug.Make(alertRule.Title+" "+alertRule.UID)+".json")
 		if err != nil {
 			log.Error("Couldn't write AlertRule to disk ", err)
 		}

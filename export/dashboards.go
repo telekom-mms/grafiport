@@ -1,12 +1,9 @@
 package export
 
 import (
-	"encoding/json"
 	"github.com/charmbracelet/log"
 	"github.com/gosimple/slug"
 	"grafana-exporter/common"
-	"os"
-	"path/filepath"
 )
 
 // Dashboards is a function that exports all dashboards from a Grafana instance and stores them as JSON files in a directory.
@@ -38,12 +35,7 @@ func Dashboards(username, password, url, directory string) error {
 		if err != nil {
 			log.Error("Error fetching Dashboard ", err)
 		}
-		jsonDashboard, err := json.Marshal(ds) // create JSON Object from Dashboard
-		if err != nil {
-			log.Error("Error unmarshalling json File ", err)
-		}
-		// write Dashboards as json to a file
-		err = os.WriteFile(filepath.Join(path, slug.Make(dashboard.Title+" "+dashboard.UID)+".json"), jsonDashboard, os.FileMode(0666)) // Make sure filename is unique, FileMode is irrelevant, but required for WriteFile
+		err = common.WriteObjectToDisk(ds, path, slug.Make(dashboard.Title+" "+dashboard.UID)+".json")
 		if err != nil {
 			log.Error("Couldn't write Dashboard to disk ", err)
 		}
