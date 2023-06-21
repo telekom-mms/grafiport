@@ -1,12 +1,9 @@
 package export
 
 import (
-	"encoding/json"
 	"github.com/charmbracelet/log"
 	"github.com/gosimple/slug"
 	"grafana-exporter/common"
-	"os"
-	"path/filepath"
 )
 
 // NotificationPolicies is a function that exports all policies for notifications from a Grafana instance and stores them as JSON files in a directory.
@@ -33,12 +30,7 @@ func NotificationPolicies(username, password, url, directory string) error {
 		return err
 	}
 
-	jsonFolder, err := json.Marshal(notificationPolicies) // create JSON Object from Policy tree
-	if err != nil {
-		log.Error("Error unmarshalling json File ", err)
-	}
-	// store the complete tree as one object
-	err = os.WriteFile(filepath.Join(path, slug.Make(notificationPolicies.Receiver)+".json"), jsonFolder, os.FileMode(0666)) // Make sure filename is unique, FileMode is irrelevant, but required for WriteFile
+	err = common.WriteObjectToDisk(notificationPolicies, path, slug.Make(notificationPolicies.Receiver)+".json")
 	if err != nil {
 		log.Error("Couldn't write NotificationPolicies to disk ", err)
 	}

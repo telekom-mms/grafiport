@@ -1,12 +1,9 @@
 package export
 
 import (
-	"encoding/json"
 	"github.com/charmbracelet/log"
 	"github.com/gosimple/slug"
 	"grafana-exporter/common"
-	"os"
-	"path/filepath"
 )
 
 // Folders is a function that exports all folders from a Grafana instance and stores them as JSON files in a directory.
@@ -39,11 +36,7 @@ func Folders(username, password, url, directory string) error {
 		if err != nil {
 			log.Error("Error fetching Folder ", err)
 		}
-		jsonFolder, err := json.Marshal(f) // create JSON Object from Folder
-		if err != nil {
-			log.Error("Error unmarshalling json File ", err)
-		}
-		err = os.WriteFile(filepath.Join(path, slug.Make(folder.Title+" "+folder.UID)+".json"), jsonFolder, os.FileMode(0666)) // Make sure filename is unique, FileMode is irrelevant, but required for WriteFile
+		err = common.WriteObjectToDisk(f, path, slug.Make(f.Title+" "+f.UID)+".json")
 		if err != nil {
 			log.Error("Couldn't write Folder to disk ", err)
 		}

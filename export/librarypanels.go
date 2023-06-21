@@ -1,12 +1,9 @@
 package export
 
 import (
-	"encoding/json"
 	"github.com/charmbracelet/log"
 	"github.com/gosimple/slug"
 	"grafana-exporter/common"
-	"os"
-	"path/filepath"
 )
 
 // LibraryPanels is a function that exports all folders from a Grafana instance and stores them as JSON files in a directory.
@@ -39,11 +36,7 @@ func LibraryPanels(username, password, url, directory string) error {
 		if err != nil {
 			log.Error("Error fetching LibraryPanel ", err)
 		}
-		jsonLibraryPanels, err := json.Marshal(p) // create JSON Object from LibraryPanel
-		if err != nil {
-			log.Error("Error unmarshalling json File ", err)
-		}
-		err = os.WriteFile(filepath.Join(path, slug.Make(panel.Name+" "+panel.UID)+".json"), jsonLibraryPanels, os.FileMode(0666)) // Make sure filename is unique, FileMode is irrelevant, but required for WriteFile
+		err = common.WriteObjectToDisk(p, path, slug.Make(p.Name+" "+p.UID)+".json")
 		if err != nil {
 			log.Error("Couldn't write Dashboard to disk ", err)
 		}

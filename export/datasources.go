@@ -1,12 +1,9 @@
 package export
 
 import (
-	"encoding/json"
 	"github.com/charmbracelet/log"
 	"github.com/gosimple/slug"
 	"grafana-exporter/common"
-	"os"
-	"path/filepath"
 )
 
 // DataSources is a function that exports all data sources from a Grafana instance and stores them as JSON files in a directory.
@@ -35,11 +32,7 @@ func DataSources(username, password, url, directory string) error {
 		if err != nil {
 			log.Error("Error fetching DataSource from Grafana ", err)
 		}
-		jsonDatasource, err := json.Marshal(ds) // create JSON Object from Datasource
-		if err != nil {
-			log.Error("Error unmarshalling json File ", err)
-		}
-		err = os.WriteFile(filepath.Join(path, slug.Make(datasource.Name+" "+datasource.UID)+".json"), jsonDatasource, os.FileMode(0666)) // Make sure filename is unique, FileMode is irrelevant, but required for WriteFile
+		err = common.WriteObjectToDisk(ds, path, slug.Make(ds.Name+" "+ds.UID)+".json")
 		if err != nil {
 			log.Error("Couldn't write DataSource to disk ", err)
 		}

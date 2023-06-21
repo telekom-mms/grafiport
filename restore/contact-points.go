@@ -1,13 +1,10 @@
 package restore
 
 import (
-	"encoding/json"
 	"github.com/charmbracelet/log"
 	gapi "github.com/grafana/grafana-api-golang-client"
 	"grafana-exporter/common"
-	"os"
 	"path/filepath"
-	"strings"
 )
 
 // ContactPoints is a function that restores all contactPoints to a Grafana instance from a given folder
@@ -17,9 +14,7 @@ import (
 // directory is the path of the directory where the dashboards will be stored.
 func ContactPoints(username, password, url, directory string) error {
 	var (
-		filesInDir      []os.DirEntry
-		rawContactPoint []byte
-		err             error
+		err error
 	)
 	folderName := "contactPoints"
 	client, err := common.InitializeClient(username, password, url) // initialize gapi Client
@@ -31,44 +26,32 @@ func ContactPoints(username, password, url, directory string) error {
 	log.Info("Starting to restore ContactPoints")
 	// path is the based on a provided directory and the naming of sub-folder os our tool
 	path := filepath.Join(directory, folderName)
-	// get all files in provided path
-	filesInDir, err = os.ReadDir(path)
+	// get all objects from provided path
+	ContactPointsSlice, err := common.ReadObjectsFromDisk[gapi.ContactPoint](path)
 	if err != nil {
-		log.Error("Failed to read folder%s\n", err)
+		log.Error("Error reading AlertRules from Disk")
+		return err
 	}
 	// looping over found files to restore
-	for _, file := range filesInDir {
-		if strings.HasSuffix(file.Name(), ".json") {
-			// read in files to json and Unmarshall them to be Object
-			if rawContactPoint, err = os.ReadFile(filepath.Join(path, file.Name())); err != nil {
-				log.Error(err)
-				continue
-			}
-
-			var newContactPoint gapi.ContactPoint
-			if err = json.Unmarshal(rawContactPoint, &newContactPoint); err != nil {
-				log.Error(err)
-				continue
-			}
-			// interact with api
-			// search for ContactPoints if exists to determine if update or create
-			// if no error then object exists
-			_, err = client.ContactPoint(newContactPoint.UID)
-			if err == nil {
-				err = client.UpdateContactPoint(&newContactPoint)
-				if err != nil {
-					log.Error("Error updating ContactPoint ", err)
-				} else {
-					log.Info("Updated ContactPoint " + newContactPoint.Name)
-				}
-
+	for _, newContactPoint := range ContactPointsSlice {
+		// interact with api
+		// search for ContactPoints if exists to determine if update or create
+		// if no error then object exists
+		_, err = client.ContactPoint(newContactPoint.UID)
+		if err == nil {
+			err = client.UpdateContactPoint(&newContactPoint)
+			if err != nil {
+				log.Error("Error updating ContactPoint ", err)
 			} else {
-				_, err = client.NewContactPoint(&newContactPoint)
-				if err != nil {
-					log.Error("Error creating ContactPoint ", err)
-				} else {
-					log.Info("Created ContactPoint " + newContactPoint.Name)
-				}
+				log.Info("Updated ContactPoint " + newContactPoint.Name)
+			}
+
+		} else {
+			_, err = client.NewContactPoint(&newContactPoint)
+			if err != nil {
+				log.Error("Error creating ContactPoint ", err)
+			} else {
+				log.Info("Created ContactPoint " + newContactPoint.Name)
 			}
 		}
 	}
