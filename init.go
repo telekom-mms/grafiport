@@ -8,14 +8,14 @@ import (
 )
 
 var (
-	username  string
-	password  string
-	url       string
-	directory string
-	help      bool
-	restore   bool
-	alerting  bool
-	dashboards bool
+	username    string
+	password    string
+	url         string
+	directory   string
+	help        bool
+	restore     bool
+	alerting    bool
+	dashboards  bool
 	datasources bool
 )
 
@@ -27,7 +27,8 @@ func init() {
 	flag.BoolVar(&help, "h", false, "The Help")
 	flag.BoolVar(&restore, "r", false, "Restore of provided backup Directory")
 	flag.BoolVar(&alerting, "alerting", false, "Export or Restore of the Alerting Objects including Alert Rules, Contact Point, Notification Policies and Notification Templates")
-	flag.BoolVar(&dashboards, "dashboard", false, "Export or Restore of the Dashboards. Default is always true")
+	flag.BoolVar(&dashboards, "dashboard", true, "Export or Restore of the Dashboards, Folders and Library Panels. Default is always true")
+	flag.BoolVar(&datasources, "dashboard", true, "Export or Restore of the Datasources. Default is always true")
 
 	flag.Parse()
 
@@ -51,10 +52,10 @@ func init() {
 	if !alerting {
 		alerting = getEnvBool("alerting")
 	}
-	if !dashboards {
+	if dashboards != getEnvBool("dashboard") {
 		dashboards = getEnvBool("dashboard")
 	}
-	if !datasources {
+	if datasources != getEnvBool("datasources") {
 		datasources = getEnvBool("datasources")
 	}
 	if !restore {
