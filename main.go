@@ -13,21 +13,25 @@ var (
 
 func main() {
 	if restore {
-		err = restores.DataSources(username, password, url, directory)
-		if err != nil {
-			errors = append(errors, err)
+		if datasources {
+			err = restores.DataSources(username, password, url, directory)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
-		err = restores.Folders(username, password, url, directory)
-		if err != nil {
-			errors = append(errors, err)
-		}
-		err = restores.LibraryPanels(username, password, url, directory)
-		if err != nil {
-			errors = append(errors, err)
-		}
-		err = restores.Dashboards(username, password, url, directory)
-		if err != nil {
-			errors = append(errors, err)
+		if dashboards {
+			err = restores.Folders(username, password, url, directory)
+			if err != nil {
+				errors = append(errors, err)
+			}
+			err = restores.LibraryPanels(username, password, url, directory)
+			if err != nil {
+				errors = append(errors, err)
+			}
+			err = restores.Dashboards(username, password, url, directory)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 		if alerting {
 			err = restores.AlertRules(username, password, url, directory)
@@ -52,21 +56,25 @@ func main() {
 			log.Error("Error in Export execution")
 		}
 	} else {
-		err = exports.DataSources(username, password, url, directory)
-		if err != nil {
-			errors = append(errors, err)
+		if datasources {
+			err = exports.DataSources(username, password, url, directory)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
-		err = exports.Dashboards(username, password, url, directory)
-		if err != nil {
-			errors = append(errors, err)
-		}
-		err = exports.Folders(username, password, url, directory)
-		if err != nil {
-			errors = append(errors, err)
-		}
-		err = exports.LibraryPanels(username, password, url, directory)
-		if err != nil {
-			errors = append(errors, err)
+		if dashboards {
+			err = exports.Dashboards(username, password, url, directory)
+			if err != nil {
+				errors = append(errors, err)
+			}
+			err = exports.Folders(username, password, url, directory)
+			if err != nil {
+				errors = append(errors, err)
+			}
+			err = exports.LibraryPanels(username, password, url, directory)
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 		if alerting {
 			err = exports.AlertRules(username, password, url, directory)
