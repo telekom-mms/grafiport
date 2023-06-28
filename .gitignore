@@ -25,4 +25,4 @@ go.work
 test/*
 # vscode entfernt
 .vscode/*
-grafana-exporter
+grafiport

@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/charmbracelet/log"
-	exports "grafana-exporter/export"
-	restores "grafana-exporter/restore"
+	exports "grafiport/export"
+	restores "grafiport/restore"
 )
 
 var (

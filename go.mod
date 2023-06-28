@@ -1,4 +1,4 @@
-module grafana-exporter
+module grafiport
 
 go 1.19
 

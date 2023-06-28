@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/charmbracelet/log"
 	gapi "github.com/grafana/grafana-api-golang-client"
-	"grafana-exporter/common"
+	"grafiport/common"
 	"path/filepath"
 )
 
