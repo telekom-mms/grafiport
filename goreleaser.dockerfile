@@ -1,6 +1,6 @@
 # final stage
 FROM alpine:latest
-COPY grafana-exporter /usr/local/bin/grafana-exporter
+COPY grafiport /usr/local/bin/grafiport
 RUN mkdir -p /output
 ENV DIRECTORY /output
-ENTRYPOINT ["grafana-exporter"]
+ENTRYPOINT ["grafiport"]

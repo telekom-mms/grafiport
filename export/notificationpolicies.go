@@ -3,7 +3,7 @@ package export
 import (
 	"github.com/charmbracelet/log"
 	"github.com/gosimple/slug"
-	"grafana-exporter/common"
+	"grafiport/common"
 )
 
 // NotificationPolicies is a function that exports all policies for notifications from a Grafana instance and stores them as JSON files in a directory.

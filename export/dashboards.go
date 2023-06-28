@@ -3,7 +3,7 @@ package export
 import (
 	"github.com/charmbracelet/log"
 	"github.com/gosimple/slug"
-	"grafana-exporter/common"
+	"grafiport/common"
 )
 
 // Dashboards is a function that exports all dashboards from a Grafana instance and stores them as JSON files in a directory.

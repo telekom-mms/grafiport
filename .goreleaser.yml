@@ -17,7 +17,7 @@ gitlab_urls:
   # Since: v1.11
   use_job_token: false
 
-# project_name: grafana-exporter
+# project_name: grafiport
 # dockers:
 #   -
 #     image_templates:
@@ -30,5 +30,5 @@ dockers:
   goarch: amd64
   dockerfile: goreleaser.dockerfile
   image_templates:
-  - 'git-images.mms-support.de/7001-02/grafana-exporter:{{ .Tag }}'
-  - 'git-images.mms-support.de/7001-02/grafana-exporter:latest'
+  - 'git-images.mms-support.de/7001-02/grafiport:{{ .Tag }}'
+  - 'git-images.mms-support.de/7001-02/grafiport:latest'
