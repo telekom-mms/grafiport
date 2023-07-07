@@ -30,5 +30,5 @@ dockers:
   goarch: amd64
   dockerfile: goreleaser.dockerfile
   image_templates:
-  - 'flkhndlr/Grafiport:{{ .Tag }}'
-  - 'flkhndlr/Grafiport:latest'
+  - 'flkhndlr/grafiport:{{ .Tag }}'
+  - 'flkhndlr/grafiport:latest'
