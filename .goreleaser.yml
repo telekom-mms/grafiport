@@ -30,5 +30,5 @@ dockers:
   goarch: amd64
   dockerfile: goreleaser.dockerfile
   image_templates:
-  - 'git-images.mms-support.de/7001-02/grafiport:{{ .Tag }}'
-  - 'git-images.mms-support.de/7001-02/grafiport:latest'
+  - 'flkhndlr/Grafiport:{{ .Tag }}'
+  - 'flkhndlr/Grafiport:latest'
