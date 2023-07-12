@@ -32,5 +32,5 @@ dockers:
   build_flag_templates:
     - "--label=org.opencontainers.image.source={{.GitURL}}"
   image_templates:
-  - 'ghcr.io/flkhndlr/grafiport:{{ .Tag }}'
-  - 'ghcr.io/flkhndlr/grafiport:latest'
+  - 'ghcr.io/telekom-mms/grafiport:{{ .Tag }}'
+  - 'ghcr.io/telekom-mms/grafiport:latest'
