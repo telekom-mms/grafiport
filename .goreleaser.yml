@@ -1,34 +1,11 @@
-#gitlab_urls:
-#  api: https://git.mms-support.de/api/v4
-#  download: https://git.mms-support.de
-#
-#  # set to true if you use a self-signed certificate
-#  skip_tls_verify: false
-#
-#  # set to true if you want to upload to the Package Registry rather than attachments
-#  # Only works with GitLab 13.5+
-#  #
-#  # Since: v1.3
-#  use_package_registry: true
-#
-#  # Set this if you set GITLAB_TOKEN to the value of CI_JOB_TOKEN.
-#  #
-#  # Default: false
-#  # Since: v1.11
-#  use_job_token: false
+project_name: grafiport
 
-# project_name: grafiport
-# dockers:
-#   -
-#     image_templates:
-#     - "7001-02/{{.ProjectName}}"
-#   dockerfile: goreleaser.dockerfile
-
+builds:
+  - env: [CGO_ENABLED=0]
 dockers:
 -
   goos: linux
   goarch: amd64
-  goamd64: "v2"
   dockerfile: goreleaser.dockerfile
   image_templates:
   - 'ghcr.io/telekom-mms/grafiport:{{ .Tag }}'

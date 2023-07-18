@@ -1,5 +1,5 @@
 # final stage
-FROM ubuntu:latest
+FROM alpine:latest
 COPY grafiport /usr/local/bin/grafiport
 RUN mkdir -p /output
 ENV DIRECTORY /output
