@@ -28,9 +28,8 @@ dockers:
 -
   goos: linux
   goarch: amd64
+  goamd64: "v2"
   dockerfile: goreleaser.dockerfile
-  build_flag_templates:
-    - "--label=org.opencontainers.image.source={{.GitURL}}"
   image_templates:
   - 'ghcr.io/telekom-mms/grafiport:{{ .Tag }}'
   - 'ghcr.io/telekom-mms/grafiport:latest'
