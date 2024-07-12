@@ -1,10 +1,12 @@
 module grafiport
 
-go 1.19
+go 1.21
+
+toolchain go1.22.5
 
 require (
 	github.com/gosimple/slug v1.14.0
-	github.com/grafana/grafana-api-golang-client v0.18.4
+	github.com/grafana/grafana-api-golang-client v0.27.0
 )
 
 require (
