@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM golang:1.23-alpine AS build-env
+FROM golang:1.25-alpine AS build-env
 RUN mkdir -p /go/src/grafiport
 
 # Copy the module files first and then download the dependencies. If this
