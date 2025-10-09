@@ -5,7 +5,7 @@ go 1.21
 toolchain go1.22.5
 
 require (
-	github.com/gosimple/slug v1.14.0
+	github.com/gosimple/slug v1.15.0
 	github.com/grafana/grafana-api-golang-client v0.27.0
 )
 
