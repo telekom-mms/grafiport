@@ -2,7 +2,7 @@ module grafiport
 
 go 1.21
 
-toolchain go1.25.5
+toolchain go1.25.6
 
 require (
 	github.com/gosimple/slug v1.15.0
